@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/ImportPriceSet</path>
+    <page_callback>CRM_Tools_Page_ImportPriceSet</page_callback>
+    <title>ImportPriceSet</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/ImportPrices</path>
+    <page_callback>CRM_Tools_Form_ImportPrices</page_callback>
+    <title>ImportPrices</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
