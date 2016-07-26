@@ -8,7 +8,6 @@
  * 
  */
 
-
 class CRM_Tools_PriceSetImporter {
 
     private $_fileData;
@@ -23,24 +22,23 @@ class CRM_Tools_PriceSetImporter {
         });
         array_shift($csv); # remove column header
         $this->_fileData = $csv;
-        
+
         // remove $ from amount
         foreach ($this->_fileData as &$row) {
-           $row['Amount'] = str_replace('$', '', $row['Amount']);
+            $row['Amount'] = str_replace('$', '', $row['Amount']);
         }
-
     }
 
     public function import() {
-        
+
         $this->createOrgs();
         $this->createAccounts();
-        
+
         $this->createMembershipTypes("CIC");
         $this->createMembershipTypes("CSCT");
         $this->createMembershipTypes("CSChE");
         $this->createMembershipTypes("CSC");
-        
+
         $this->createPriceSets(TRUE, TRUE, "CIC", 'Current');
         $this->createPriceSets(TRUE, TRUE, "CIC", 'Next');
         $this->createPriceSets(TRUE, FALSE, "CSCT", 'Current');
@@ -49,11 +47,8 @@ class CRM_Tools_PriceSetImporter {
         $this->createPriceSets(TRUE, FALSE, "CSChE", 'Next');
         $this->createPriceSets(TRUE, FALSE, "CSC", 'Current');
         $this->createPriceSets(TRUE, FALSE, "CSC", 'Next');
-
-        
-        
     }
-    
+
     private function createPriceSets($isMem, $isContrib, $society, $year) {
         $cnt = 0;
         foreach ($this->_fileData as $row) {
@@ -66,20 +61,20 @@ class CRM_Tools_PriceSetImporter {
             if ($this->isEmpty($account)) {
                 continue;
             }
-            $priceSet = str_replace('${Society}', $society, $priceSet);
-            $priceSet = str_replace('${Year}', "$year Year", $priceSet);
+            $priceSet = $this->parse($priceSet, $society, $year);
+
 
             $priceSetId = CRM_Price_BAO_PriceSet::getFieldValue('CRM_Price_BAO_PriceSet', $priceSet, 'id', 'name', TRUE);
             if ($priceSetId) {
                 continue;
             }
-            
+
             $financeTypeId = CRM_Financial_DAO_FinancialType::getFieldValue('CRM_Financial_DAO_FinancialType', 'Member Dues', 'id', 'name', TRUE);
             if (!$financeTypeId) {
                 throw new Exception("Did not find 'Member Dues' for membershiptype $priceSet");
             }
-            
-            
+
+
 
             $bao = new CRM_Price_BAO_PriceSet();
             $bao->name = $priceSet;
@@ -88,12 +83,11 @@ class CRM_Tools_PriceSetImporter {
             $bao->financial_type_id = $financeTypeId;
             $bao->title = $priceSet;
             $priceSetId = $bao->insert();
-            
+
             $this->createPriceSetFieldsAndOptions($society, $year, $priceSet, $priceSetId);
         }
-        
     }
-    
+
     private function createMembershipTypes($society) {
         $cnt = 0;
         foreach ($this->_fileData as $row) {
@@ -107,14 +101,14 @@ class CRM_Tools_PriceSetImporter {
                 continue;
             }
             $memType = str_replace('${Society}', $society, $memType);
-            $exempt = ("yes" == strtolower($row["Exempt"])) ;
+            $exempt = ("yes" == strtolower($row["Exempt"]));
             $financeType = $this->getFinanceType($account, $exempt, $society, "Current Year", $row);
-            
+
             $memTypeId = CRM_Member_BAO_MembershipType::getFieldValue("CRM_Member_BAO_MembershipType", $memType, 'id', 'name', TRUE);
             if ($memTypeId) {
                 continue;
             }
-            
+
             $financeTypeId = CRM_Financial_DAO_FinancialType::getFieldValue('CRM_Financial_DAO_FinancialType', $account, 'id', 'name', TRUE);
             if (!$financeTypeId) {
                 throw new Exception("Did not find $financeType for membershiptype $memType");
@@ -126,15 +120,15 @@ class CRM_Tools_PriceSetImporter {
             $bao->financial_type_id = $financeTypeId;
             $memSociety = $row['Membership Org'];
             $memSociety = str_replace('${Society}', $society, $memSociety);
-            
+
             if (!$memSociety) {
                 throw new Exception("Unknown society: $memSociety");
             }
-            
+
             if (!$this->_societies[$memSociety]) {
                 throw new Exception("Could not find society's $memSociety id");
             }
-            
+
             $bao->member_of_contact_id = $this->_societies[$memSociety];
             $amount = $row['Amount'];
             $amount = str_replace('$', '', $amount);
@@ -149,13 +143,11 @@ class CRM_Tools_PriceSetImporter {
             $bao->fixed_period_rollover_day = 1231;
             $bao->visibility = "Public";
             $bao->description = $memType;
-            
+
             $bao->insert();
-            
         }
-        
     }
-    
+
     private function createOrgs() {
         $this->createOrg("CIC", "The Canadian Institue of Chemistry");
         $this->createOrg("CSC", "Canadian Society for Chemistry");
@@ -172,7 +164,7 @@ class CRM_Tools_PriceSetImporter {
             $this->createOrg($org, $org);
         }
     }
-    
+
     private function createOrg($shortName, $longName) {
         if (array_key_exists($shortName, $this->_societies)) {
             return;
@@ -216,8 +208,8 @@ class CRM_Tools_PriceSetImporter {
         }
         $this->_tax_account_id = $financialAccountId;
 
-        
-        
+
+
         foreach ($this->_fileData as $row) {
             $this->createAccount("CSC", "Current Year", $row);
             $this->createAccount("CSChE", "Current Year", $row);
@@ -229,7 +221,7 @@ class CRM_Tools_PriceSetImporter {
             $this->createAccount("CIC", "Next Year", $row);
         }
     }
-    
+
     private function createAccount($society, $year, $row) {
         $accountNum = $row["Account $society/$year"];
         if (!$accountNum) {
@@ -238,27 +230,38 @@ class CRM_Tools_PriceSetImporter {
         if ($this->isEmpty($accountNum)) {
             return;
         }
-        $exempt = ("yes" == strtolower($row["Exempt"])) ;
+        $exempt = ("yes" == strtolower($row["Exempt"]));
         $financeType = $this->getFinanceType($accountNum, $exempt, $society, $year, $row);
-        
+
         $amount = $row['Amount'];
-        
+
         $this->createFinancialAccountIfMissing($accountNum);
         $this->createFinancialTypeIfMissing($financeType, $accountNum, $exempt, $amount);
     }
-    
+
+    private function parse($inputString, $society, $year) {
+        $toReturn = $inputString;
+        $toReturn = str_replace('${Society}', $society, $toReturn);
+        $toReturn = str_replace('${Year}', "$year Year", $toReturn);
+        if ("$year" == "Current") {
+            $toReturn = str_replace('${YearNC}', "", $toReturn);
+        } else {
+            $toReturn = str_replace('${YearNC}', "Future - ", $toReturn);
+        }
+        return $toReturn;
+    }
+
     private function getFinanceType($accountNum, $exempt, $society, $year, $row) {
         $yearShort = ("Current Year" == $year) ? "CY" : "FY";
         $ftName = $row['Financial Type'];
         if (!$ftName) {
             $ftName = $row['Field Value'];
         }
-        $ftName = str_replace('${Society}', $society, $ftName);
-        $ftName = str_replace('${Year}', $year, $ftName);
-        
+        $ftName = $this->parse($ftName, $society, $year);
+
         $ftTax = $exempt ? " (exempt)" : "";
-        
-        if ( $this->allRowAccountsSame($row)) {
+
+        if ($this->allRowAccountsSame($row)) {
             // everything is same account, don't include society or year.
             $financeType = "$ftName $accountNum$ftTax";
         } else if ($this->allRowAccountsSameRegardlessOfSociety($row)) {
@@ -272,13 +275,12 @@ class CRM_Tools_PriceSetImporter {
             $financeType = "$ftName $accountNum $yearShort$ftTax";
         }
         return $financeType;
-
     }
-    
+
     private function allRowAccountsSame($row) {
         $base;
         foreach ($row as $key => $value) {
-            if (!(substr( $key, 0, 7) == "Account")) {
+            if (!(substr($key, 0, 7) == "Account")) {
                 continue;
             }
             if ($this->isEmpty($value)) {
@@ -294,12 +296,12 @@ class CRM_Tools_PriceSetImporter {
         }
         return true;
     }
-    
+
     private function allRowAccountsSameRegardlessOfSociety($row) {
         $baseCY;
         $baseFY;
         foreach ($row as $key => $value) {
-            if (!(substr( $key, 0, 7) == "Account")) {
+            if (!(substr($key, 0, 7) == "Account")) {
                 continue;
             }
             if ($this->isEmpty($value)) {
@@ -321,23 +323,21 @@ class CRM_Tools_PriceSetImporter {
                 if ($baseFY != $value) {
                     return false;
                 }
-                
             }
         }
         return true;
     }
 
-    
-    private function createFinancialTypeIfMissing($financeType, $accountingCode,  $exempt, $amount) {
+    private function createFinancialTypeIfMissing($financeType, $accountingCode, $exempt, $amount) {
         $financialAccountId = CRM_Financial_DAO_FinancialAccount::getFieldValue('CRM_Financial_DAO_FinancialAccount', $accountingCode, 'id', 'accounting_code', TRUE);
         if ($financialAccountId == FALSE) {
             throw new Exception("Missing account '" . $accountingCode . ".'");
         }
         $financeTypeId = CRM_Financial_DAO_FinancialType::getFieldValue('CRM_Financial_DAO_FinancialType', $accountingCode, 'id', 'name', TRUE);
         $incomeAccountRelType = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
-        
+
         if ($financeTypeId == FALSE) {
-            
+
             // Create FInancial Type
             $params = array(
                 'name' => $financeType,
@@ -349,7 +349,7 @@ class CRM_Tools_PriceSetImporter {
             $ftDAO->is_reserved = 0;
             $ftDAO->is_deductible = 0;
             $financeTypeId = $ftDAO->insert();
-            
+
             // Create Other Types using 'Member Dues' as an example, exclude 'income account is.
             // we'll do that one manually.
             $sql = "insert into civicrm_entity_financial_account(entity_table, entity_id, account_relationship, financial_account_id) " .
@@ -362,15 +362,15 @@ class CRM_Tools_PriceSetImporter {
                     "   and a.account_relationship = v.value " .
                     "   and not v.name like 'Income Account is' ";
             CRM_Financial_DAO_FinancialType::executeQuery($sql);
-            
+
             $dao = new CRM_Financial_DAO_EntityFinancialAccount();
             $dao->entity_table = 'civicrm_financial_type';
             $dao->entity_id = $financeTypeId;
             $dao->account_relationship = $incomeAccountRelType;
             $dao->financial_account_id = $financialAccountId;
             $dao->insert();
-            
-            if (!$exempt  && $amount != 0) {
+
+            if (!$exempt && $amount != 0) {
                 $dao = new CRM_Financial_DAO_EntityFinancialAccount();
                 $dao->entity_table = 'civicrm_financial_type';
                 $dao->entity_id = $financeTypeId;
@@ -379,9 +379,7 @@ class CRM_Tools_PriceSetImporter {
                 $dao->insert();
             }
         }
-        
     }
-
 
     private function createFinancialAccountIfMissing($accountingCode) {
         $financialAccountId = CRM_Financial_DAO_FinancialAccount::getFieldValue('CRM_Financial_DAO_FinancialAccount', $accountingCode, 'id', 'accounting_code', TRUE);
@@ -434,7 +432,7 @@ class CRM_Tools_PriceSetImporter {
         }
     }
 
-      private function addOption(&$fieldDef, $fee, $desc, $memTypeName, $financialTypeId) {
+    private function addOption(&$fieldDef, $fee, $desc, $memTypeName, $financialTypeId) {
         array_push($fieldDef['option_label'], $desc);
         array_push($fieldDef['option_description'], $desc);
         if ("User" == $fee) {
@@ -442,10 +440,10 @@ class CRM_Tools_PriceSetImporter {
         } else {
             array_push($fieldDef['option_amount'], $fee);
         }
-        
+
         array_push($fieldDef['option_financial_type_id'], $financialTypeId);
-        $weight = count( $fieldDef['option_weight'] );
-        array_push($fieldDef['option_weight'], $weight );
+        $weight = count($fieldDef['option_weight']);
+        array_push($fieldDef['option_weight'], $weight);
 
 
         if (!$this->isEmpty($memTypeName)) {
@@ -474,11 +472,11 @@ class CRM_Tools_PriceSetImporter {
         $fieldDef['is_required'] = $required;
         $fieldDef['weight'] = $weight;
         if ("User" == $fee) {
-        $fieldDef['is_display_amounts'] = 0;
-        $fieldDef['is_enter_qty'] = 1;
+            $fieldDef['is_display_amounts'] = 0;
+            $fieldDef['is_enter_qty'] = 1;
         } else {
-        $fieldDef['is_display_amounts'] = 1;
-        $fieldDef['is_enter_qty'] = 0;
+            $fieldDef['is_display_amounts'] = 1;
+            $fieldDef['is_enter_qty'] = 0;
         }
 
 
@@ -496,7 +494,7 @@ class CRM_Tools_PriceSetImporter {
 
     private function createPriceSetFieldsAndOptions($society, $year, $priceSetIn, $priceSetId) {
         $priceSetFields = array();
-        
+
         $cnt = 0;
         foreach ($this->_fileData as $row) {
             $field = $row['Field'];
@@ -511,54 +509,42 @@ class CRM_Tools_PriceSetImporter {
             if ($this->isEmpty($account)) {
                 continue;
             }
-            
-            $exempt = ("yes" == strtolower($row["Exempt"])) ;
-            $required = ("yes" == strtolower($row["Mandatory"])) ;
-            
+
+            $exempt = ("yes" == strtolower($row["Exempt"]));
+            $required = ("yes" == strtolower($row["Mandatory"]));
+
             $financeType = $this->getFinanceType($account, $exempt, $society, "$year Year", $row);
             $financeTypeId = CRM_Financial_DAO_FinancialType::getFieldValue('CRM_Financial_DAO_FinancialType', $account, 'id', 'name', TRUE);
             if (!$financeTypeId) {
                 throw new Exception("Unable to determine finance type for $financeType / $society / $year / $field / $fieldOption");
             }
 
-            $field = str_replace('${Society}', $society, $field);
-            $field = str_replace('${Year}', "$year Year", $field);
-            
-            $priceSet = $row['Price Set'];
-            $priceSet = str_replace('${Society}', $society, $priceSet);
-            $priceSet = str_replace('${Year}', "$year Year", $priceSet);
+            $field = $this->parse($field, $society, $year);
+
+            $priceSet = $this->parse($row['Price Set'], $society, $year);
             $type = $this->getType($row['Type']);
-            
-            if ($priceSet !=  $priceSetIn) {
+
+            if ($priceSet != $priceSetIn) {
                 continue;
             }
             $cnt++;
-            
+
             $fee = $row['Amount'];
             if (!array_key_exists($field, $priceSetFields)) {
                 $priceSetFields[$field] = $this->createNewField($priceSetId, $cnt, $field, $type, $field, $required, $fee);
             }
-            
-            $memTypeName = $row['Membership Type'];
-            $memTypeName = str_replace('${Society}', $society, $memTypeName);
-            $memTypeName = str_replace('${Year}', "$year Year", $memTypeName);
+
+            $memTypeName = $this->parse($row['Membership Type'], $society, $year);
             $fee = $row['Amount'];
-            $desc = $row['Field Value'];
-            $desc = str_replace('${Society}', $society, $desc);
-            $desc = str_replace('${Year}', "$year Year", $desc);
-            
+            $desc = $this->parse($row['Field Value'], $society, $year);
+
             $this->addOption($priceSetFields[$field], $fee, $desc, $memTypeName, $financeTypeId);
-            
         }
-        
+
         foreach ($priceSetFields as $key => $options) {
             CRM_Price_BAO_PriceField::create($options);
         }
-
-
     }
-
-  
 
     private function getType($typeIn) {
         $validTypes = CRM_Price_BAO_PriceField::htmlTypes();
@@ -566,7 +552,7 @@ class CRM_Tools_PriceSetImporter {
             return $typeIn;
         }
         $lowerTypeIn = strtolower($typeIn);
-        foreach ( $validTypes as $key => $value) {
+        foreach ($validTypes as $key => $value) {
             $lowerKey = strtolower($key);
             $lowerValue = strtolower($value);
             if (strcmp($lowerKey, $lowerTypeIn) == 0 || strcmp($lowerValue, $lowerTypeIn) == 0) {
@@ -589,7 +575,7 @@ class CRM_Tools_PriceSetImporter {
             return $value;
         }
     }
-    
+
     private function isEmpty($str) {
         if (!$str) {
             return true;
@@ -604,7 +590,4 @@ class CRM_Tools_PriceSetImporter {
         }
     }
 
-
 }
-
-
