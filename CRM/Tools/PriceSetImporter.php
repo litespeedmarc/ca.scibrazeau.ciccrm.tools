@@ -109,7 +109,7 @@ class CRM_Tools_PriceSetImporter {
                 continue;
             }
 
-            $financeTypeId = CRM_Financial_DAO_FinancialType::getFieldValue('CRM_Financial_DAO_FinancialType', $account, 'id', 'name', TRUE);
+            $financeTypeId = CRM_Financial_DAO_FinancialType::getFieldValue('CRM_Financial_DAO_FinancialType', $account, 'id', 'id', TRUE);
             if (!$financeTypeId) {
                 throw new Exception("Did not find $financeType for membershiptype $memType");
             }
@@ -194,14 +194,14 @@ class CRM_Tools_PriceSetImporter {
         $financialAccountId = CRM_Financial_DAO_FinancialAccount::getFieldValue('CRM_Financial_DAO_FinancialAccount', $accountingCode, 'id', 'accounting_code', TRUE);
         if (!$financialAccountId) {
             $params = array(
-                'name' => $accountingCode,
+                'name' => 'General Tax Account',
                 'description' => $accountingCode,
                 'contact_id' => 1,
                 'financial_account_type' => 2,
                 'accounting_code' => $accountingCode,
                 'is_reserved' => 0,
-                'is_tax' => 1,
-                'tax_rate' => 8,
+                'is_tax' => 0,
+//                'tax_rate' => 8,
                 'is_active' => TRUE
             );
             $financialAccountId = CRM_Financial_BAO_FinancialAccount::add($params)->id;
@@ -235,7 +235,7 @@ class CRM_Tools_PriceSetImporter {
 
         $amount = $row['Amount'];
 
-        $this->createFinancialAccountIfMissing($accountNum);
+        $this->createFinancialAccountIfMissing($financeType, $accountNum);
         $this->createFinancialTypeIfMissing($financeType, $accountNum, $exempt, $amount);
     }
 
@@ -333,7 +333,7 @@ class CRM_Tools_PriceSetImporter {
         if ($financialAccountId == FALSE) {
             throw new Exception("Missing account '" . $accountingCode . ".'");
         }
-        $financeTypeId = CRM_Financial_DAO_FinancialType::getFieldValue('CRM_Financial_DAO_FinancialType', $accountingCode, 'id', 'name', TRUE);
+        $financeTypeId = CRM_Financial_DAO_FinancialType::getFieldValue('CRM_Financial_DAO_FinancialType', $accountingCode, 'id', 'id', TRUE);
         $incomeAccountRelType = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
 
         if ($financeTypeId == FALSE) {
@@ -343,8 +343,9 @@ class CRM_Tools_PriceSetImporter {
                 'name' => $financeType,
             );
             $ftDAO = new CRM_Financial_DAO_FinancialType();
-            $ftDAO->name = $accountingCode;
+            $ftDAO->name = $financeType;
             $ftDAO->description = $financeType;
+            $ftDAO->id = $accountingCode;
             $ftDAO->is_active = 1;
             $ftDAO->is_reserved = 0;
             $ftDAO->is_deductible = 0;
@@ -381,11 +382,12 @@ class CRM_Tools_PriceSetImporter {
         }
     }
 
-    private function createFinancialAccountIfMissing($accountingCode) {
+    private function createFinancialAccountIfMissing($financeType, $accountingCode) {
         $financialAccountId = CRM_Financial_DAO_FinancialAccount::getFieldValue('CRM_Financial_DAO_FinancialAccount', $accountingCode, 'id', 'accounting_code', TRUE);
         if (!$financialAccountId) {
             $params = array(
-                'name' => $accountingCode,
+                'id' => $accountingCode,
+                'name' => $financeType,
                 'description' => $accountingCode,
                 'contact_id' => 1,
                 'financial_account_type' => 3,
