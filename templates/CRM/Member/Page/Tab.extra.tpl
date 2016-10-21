@@ -1,7 +1,7 @@
 {crmAPI var="contactInfo" entity="contact" action="get" version="3" id=$contactId sequential=1}
     
 {if $context eq "membership"}
-<script src="/sites/default/files/civicrm/ext/ca.scibrazeau.ciccrm.tools/js/cic_tax_hack.js"/>
+<script src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/cic_tax_hack.js"/>
 {/if}
 
 <script>
@@ -84,5 +84,5 @@
 
 
 {if $context ne "membership"}
-<script src="/sites/default/files/civicrm/ext/ca.scibrazeau.ciccrm.tools/js/cic_tax_hack.js"/>
+    <script src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/cic_tax_hack.js"/>
 {/if}

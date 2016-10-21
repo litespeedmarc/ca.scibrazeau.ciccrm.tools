@@ -25,9 +25,8 @@
         });
     });
     {/literal}
-            
-            
 </script>
 
-<script src="/sites/default/files/civicrm/ext/ca.scibrazeau.ciccrm.tools/js/cic_tax_hack.js"/>
+
+<script src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/cic_tax_hack.js"/>
 
