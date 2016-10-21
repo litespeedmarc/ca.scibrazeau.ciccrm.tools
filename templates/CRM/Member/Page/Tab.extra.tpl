@@ -1,5 +1,5 @@
 {crmAPI var="contactInfo" entity="contact" action="get" version="3" id=$contactId sequential=1}
-    
+
 {if $context eq "membership"}
 <script src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/cic_tax_hack.js"/>
 {/if}
@@ -47,6 +47,9 @@
 
         // when contact changes, load the province from CiviCRM, and update variable, above
         CRM.$('#contact_id').change(contactIdChangeFunction);
+        // also need to call this when price set changes, in order to set right jurisdiction
+        // in new price set HTML that will get loaded
+        CRM.$('#price_set_id').change(contactIdChangeFunction);
 
         CRM.$(document).ready( function() { 
             contactIdChangeFunction();
