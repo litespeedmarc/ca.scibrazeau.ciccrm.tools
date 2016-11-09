@@ -124,35 +124,29 @@ function tools_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _tools_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
-/**
- * Functions below this ship commented out. Uncomment as required.
- *
 
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
-function tools_civicrm_preProcess($formName, &$form) {
 
-} // */
-
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- *
-function tools_civicrm_navigationMenu(&$menu) {
-  _tools_civix_insert_navigation_menu($menu, NULL, array(
-    'label' => ts('The Page', array('domain' => 'ca.scibrazeau.ciccrm.tools')),
-    'name' => 'the_page',
-    'url' => 'civicrm/the-page',
-    'permission' => 'access CiviReport,access CiviContribute',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _tools_civix_navigationMenu($menu);
-} // */
+function tools_civicrm_buildForm($formName, &$form) {
+  if ($formName == 'CRM_Contribute_Form_Contribution_Confirm' ||
+        $formName == 'CRM_Contribute_Form_Contribution_ThankYou'
+  ) {
+    $priceSets = $form->get_template_vars('lineItem');
+    if (empty($priceSets)) {
+      return;
+    }
+    foreach ($priceSets as $priceSetId => &$priceFields) {
+      foreach ($priceFields as $priceFieldId => &$priceFieldFields) {
+        if ($priceFieldFields['label'] == 'hidden_taxes') {
+          $priceFieldFields['label'] = 'Taxes';
+        }
+        if ($priceFieldFields['description'] == 'hidden_taxes') {
+          $priceFieldFields['description'] = 'Taxes';
+        }
+      }
+    }
+    $form->assign('lineItem', $priceSets);
+  }
+}
 
 
 function hook_civicrm_pageRun( &$page ) {
