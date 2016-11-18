@@ -124,9 +124,55 @@ function tools_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _tools_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
+function tools_civicrm_validateForm($formName, &$submitValues, &$submittedFiles, &$form, &$hookErrors) {
+  if ($formName == 'CRM_Contribute_Form_Contribution_Main') {
+    if (isTooCurrent('email', $submitValues['email-5'])) {
+      $hookErrors['_qf_default'] = 'Your membership is already up-to-date.  It is too early to renew';
+    }
+
+    if (isTooCurrent('id', $submitValues['select_contact_id'])) {
+      $hookErrors['_qf_default'] = 'Your membership is already up-to-date.  It is too early to renew';
+    }
+  }
+
+}
+
+function isTooCurrent($field, $value) {
+  $contact= civicrm_api3('Contact', 'get', array(
+    'sequential' => 1,
+    $field => $value,
+  ));
+  if (empty($contact['values'])) {
+    return FALSE;
+  }
+
+  $result = civicrm_api3('Membership', 'get', array(
+    'sequential' => 1,
+    'contact_id' => $contact['values'][0]['contact_id'],
+    'status_id' => 1
+  ));
+
+  if (!empty($result['values'])) {
+    return TRUE;
+  }
+
+  $result = civicrm_api3('Membership', 'get', array(
+    'sequential' => 1,
+    'contact_id' => $contact['values'][0]['contact_id'],
+    'status_id' => 2
+  ));
+
+  if (!empty($result)) {
+    return TRUE;
+  }
+}
 
 
 function tools_civicrm_buildForm($formName, &$form) {
+  // This is a cheap replacement of "hidden_taxes", special contribution element
+  // it replaces "hidden_taxes", the label used to trigger the tax logic into
+  // something more user friendly (i.e., 'Taxes').  It is done only on
+  // Contribution Confirmation & Contribution Thank you pages
   if ($formName == 'CRM_Contribute_Form_Contribution_Confirm' ||
         $formName == 'CRM_Contribute_Form_Contribution_ThankYou'
   ) {
