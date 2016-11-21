@@ -130,7 +130,7 @@ function tools_civicrm_validateForm($formName, &$submitValues, &$submittedFiles,
       $hookErrors['_qf_default'] = 'Your membership is already up-to-date.  It is too early to renew';
     }
 
-    if (isTooCurrent('id', $submitValues['select_contact_id'])) {
+    if (isset($submitValues['select_contact_id']) && isTooCurrent('id', $submitValues['select_contact_id'])) {
       $hookErrors['_qf_default'] = 'Your membership is already up-to-date.  It is too early to renew';
     }
   }
