@@ -127,11 +127,13 @@ function tools_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 function tools_civicrm_validateForm($formName, &$submitValues, &$submittedFiles, &$form, &$hookErrors) {
   if ($formName == 'CRM_Contribute_Form_Contribution_Main') {
     if (isTooCurrent('email', $submitValues['email-5'])) {
-      $hookErrors['_qf_default'] = 'Your membership is already up-to-date.  It is too early to renew';
+ 	$source = $submitValues['email-5'];
+      $hookErrors['_qf_default'] = "Your membership is already up-to-date ($email).  It is too early to renew";
     }
 
     if (isset($submitValues['select_contact_id']) && isTooCurrent('id', $submitValues['select_contact_id'])) {
-      $hookErrors['_qf_default'] = 'Your membership is already up-to-date.  It is too early to renew';
+ 	$source = $submitValues['select_contact_id'];
+      $hookErrors['_qf_default'] = "Your membership is already up-to-date ($source).  It is too early to renew";
     }
   }
 
@@ -146,23 +148,26 @@ function isTooCurrent($field, $value) {
     return FALSE;
   }
 
+
   $result = civicrm_api3('Membership', 'get', array(
     'sequential' => 1,
     'contact_id' => $contact['values'][0]['contact_id'],
     'status_id' => 1
   ));
 
+
   if (!empty($result['values'])) {
     return TRUE;
   }
 
+	
   $result = civicrm_api3('Membership', 'get', array(
     'sequential' => 1,
     'contact_id' => $contact['values'][0]['contact_id'],
     'status_id' => 2
   ));
 
-  if (!empty($result)) {
+  if (!empty($result['values'])) {
     return TRUE;
   }
 }
