@@ -1,3 +1,4 @@
+
 CRM.$(document).ready(function () {
 
     // Convert a BUNCH of fields into a table.
@@ -28,8 +29,19 @@ CRM.$(document).ready(function () {
     CRM.$(tableHtml).insertBefore('#editrow-custom_' + ids[0]);
 
     for (var i = 0; i < arrayLength; i++) {
-        var el = CRM.$("#custom_" + i).detach();
-        el.appendTo(CRM.$('#td_custom_' + i)[0]);
+        var el = CRM.$("#custom_" + ids[i])[0];
+	while (el && el.className != 'content') {
+		el = el.parentElement;
+	}
+	var to = CRM.$('#td_custom_' + ids[i])[0];
+	el = CRM.$(el).detach();
+        el.appendTo(to);
+	console.log("moved #custom_" + ids[i] + "(" + el + ") to " + to);
+
+	CRM.$('#editrow-custom_' + ids[i]).remove();
     }
+
+    // XXX TODO: Add Java script to hide next row if previous row is empty
+
 
 });
