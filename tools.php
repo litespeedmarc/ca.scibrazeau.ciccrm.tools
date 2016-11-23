@@ -152,7 +152,7 @@ function isTooCurrent($field, $value) {
   $result = civicrm_api3('Membership', 'get', array(
     'sequential' => 1,
     'contact_id' => $contact['values'][0]['contact_id'],
-    'status_id' => 1
+    'status_id' => 1, // "New" membership status, "too Current".
   ));
 
 
@@ -164,7 +164,7 @@ function isTooCurrent($field, $value) {
   $result = civicrm_api3('Membership', 'get', array(
     'sequential' => 1,
     'contact_id' => $contact['values'][0]['contact_id'],
-    'status_id' => 2
+    'status_id' => 2, // "Current" membership status, "too Current".
   ));
 
   if (!empty($result['values'])) {
