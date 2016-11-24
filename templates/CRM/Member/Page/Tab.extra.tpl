@@ -1,3 +1,4 @@
+{if $action ne 16}
 {crmAPI var="contactInfo" entity="contact" action="get" version="3" id=$contactId sequential=1}
 
 
@@ -89,4 +90,5 @@
 
 {if $context ne "membership"}
     <script src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/cic_tax_hack.js"/>
+{/if}
 {/if}
