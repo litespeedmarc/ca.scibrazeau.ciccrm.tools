@@ -19,15 +19,13 @@ function createShowFunction(i) {
 }
 
 
-CRM.$(document).ready(function () {
-
-
 function hideEduConfirm() {
     for (var i = itemsPerRow; i < ids.length; i++) {
         CRM.$('#editrow-custom_' + i).hide();
     }
 
 }
+
 
 CRM.$(document).ready(function () {
 
