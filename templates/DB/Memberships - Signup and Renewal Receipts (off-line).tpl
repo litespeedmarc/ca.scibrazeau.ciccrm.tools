@@ -7,15 +7,46 @@
 <body style='font-family: Verdana,Geneva,sans-serif;'>
 
 {* standardize field names between online & offline *}
+{* we check standard "online" names.  And if empty, we get from their equivalent offline names *}
 {if empty($contact_id)}
    {assign var="contact_id" value=$contactID}
 {/if}
+{if empty($amount)}
+    {assign var='amount' value=$formValues.total_amount}
+{/if}
+
 
 {* Load contact no matter what, allowing for consistent template below *}
 {crmAPI var='result' entity='Contact' action='get' id=$contact_id}
 {assign var='contact' value=$result.values[0]}
 
+{* Ditto for Custom Fields *}
+{crmAPI var='result' entity='CustomValue' action='get' entity_id=$contact_id}
+{foreach from=$result.values item=customValue}
+    {if $customValue.id eq 13}
+        {assign var='primary_division' value=$customValue[0]}
+    {/if}
+    {if $customValue.id eq 15}
+        {assign var='additional_divisions' value=$customValue[0]}
+    {/if}
+{/foreach}
 
+{* Custom Fields gets more complicated, we need to lookup what each code means *}
+{if !empty($primary_division)}
+    {crmAPI var='result' entity='OptionValue' action='get' return="label" option_group_id="primary_division_20160912142401" value=$primary_division}
+    {assign var='primary_division' value=$result.values[0].label}
+{/if}
+{if !empty($additional_divisions)}
+    {capture assign=add_div}
+        {foreach from=$additional_divisions item=div}
+            {crmAPI var='result' entity='OptionValue' action='get' return="label" option_group_id="additional_divisions_20160912143714" value=$div}
+            {$result.values[0].label}<br/>
+        {/foreach}
+    {/capture}
+{/if}
+
+
+{**   Set some constants for easier html manipulation, below **}
 {capture assign=font}font-family: Verdana,Geneva,sans-serif; font-size:10pt;{/capture}
 {capture assign=headerStyle1}style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee; {$font}"{/capture}
 {capture assign=headerStyle3}colspan="3" {$headerStyle1}{/capture}
@@ -24,16 +55,19 @@
 {capture assign=valueStyle1 }style="padding: 4px; border-bottom: 1px solid #999; {$font}"{/capture}
 {capture assign=valueStyle3 }colspan=3 {$valueStyle1}{/capture}
 
+
+{**   Assign address to full_address **}
 {capture assign=full_address}
-{$contact.street_address}
-{if !empty($contact.supplemental_address_1)}<br/>{$ccontact.supplemental_address_1}{/if}
-{if !empty($contact.supplemental_address_2)}<br/>{$ccontact.supplemental_address_2}{/if}
-<br/>{$contact.city}, {$contact.state_province_name}
+{if !empty($contact.street_address)}{$contact.street_address}<br/>{/if}
+{if !empty($contact.supplemental_address_1)}{$contact.supplemental_address_1}<br/>{/if}
+{if !empty($contact.supplemental_address_2)}{$contact.supplemental_address_2}<br/>{/if}
+{$contact.city}, {$contact.state_province_name}
 {if $contact.country ne "Canada"}<br/>{$contact.$country}{/if}
 {/capture}
 
 
-{assign var='join_date' value=""}
+{assign var='join_date' value=$formValues.join_date}
+{if empty($join_date)}
 {foreach from=$lineItem item=value key=priceset}
 {foreach from=$value item=line}
 {if !empty($line.join_date)}
@@ -41,6 +75,7 @@
 {/if}
 {/foreach}
 {/foreach}
+{/if}
 
 <div>
     <img alt="" src="https://cividev.cheminst.ca/sites/cividev.cheminst.ca/files/civicrm/persist/contribute/images/2016_MembershipReceipt_Header.jpg" style="width: 650px; height: 145px;" /></td>
@@ -55,11 +90,11 @@
     </tr>
     <tr>
         <td {$labelStyle1} width=25%>{ts}Name{/ts} : </td>
-        <td {$valueStyle3}>{$display_Name}</td>
+        <td {$valueStyle3}>{$contact.display_name}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Email Address{/ts} : </td>
-        <td {$valueStyle3}>{$email}</td>
+        <td {$valueStyle3}>{$contact.email}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Mailing Address{/ts} : </td>
@@ -75,11 +110,11 @@
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Primary Division{/ts} : </td>
-        <td {$valueStyle3}>{$customfield.Primary_Division}</td>
+        <td {$valueStyle3}>{$primary_division}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Additional Divisions{/ts} : </td>
-        <td {$valueStyle3}>{$customfield.Additional_Divisions}</td>
+        <td {$valueStyle3}>{$add_div}</td>
     </tr>
 </table>
 

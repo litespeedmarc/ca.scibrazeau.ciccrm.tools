@@ -1,3 +1,12 @@
+
+// Convert a BUNCH of fields into a table.
+
+// XXX TODO: move this server side!  And drive from DB!
+var ids = [16,22,28,29,30,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51];
+var maxRows = 5;
+var arrayLength = ids.length;
+var itemsPerRow = arrayLength / maxRows;
+
 function createShowFunction(i) {
 	return function (e) {
                 var nextRow = i + 1;
@@ -12,13 +21,18 @@ function createShowFunction(i) {
 
 CRM.$(document).ready(function () {
 
+
+function hideEduConfirm() {
+    for (var i = itemsPerRow; i < ids.length; i++) {
+        CRM.$('#editrow-custom_' + i).hide();
+    }
+
+}
+
+CRM.$(document).ready(function () {
+
     // Convert a BUNCH of fields into a table.
 
-    // XXX TODO: move this server side!  And drive from DB!
-    var ids = [16,22,28,29,30,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51];
-    var maxRows = 5;
-    var arrayLength = ids.length;
-    var itemsPerRow = arrayLength / maxRows;
 
     var tableHtml =
         "<table border='1'>" +
