@@ -1,8 +1,13 @@
+<script src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/cic_edu_hack.js"/>
+
 <script>
     {assign var=stateProvKey value="state_province-Primary"}
     
+
     {literal}
     CRM.$(document).ready( function() {
+
+	hideEduConfirm();
         
         var taxCalculator = new TaxCalculator();
         taxCalculator.getProvinceId = function() { return "{/literal}{$form.$stateProvKey.value[0]}{literal}"; };
@@ -29,4 +34,3 @@
 
 
 <script src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/cic_tax_hack.js"/>
-

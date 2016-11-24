@@ -20,6 +20,7 @@ function createShowFunction(i) {
 
 
 function hideEduConfirm() {
+alert("Bye");
     for (var i = itemsPerRow; i < ids.length; i++) {
         CRM.$('#editrow-custom_' + i).hide();
     }
