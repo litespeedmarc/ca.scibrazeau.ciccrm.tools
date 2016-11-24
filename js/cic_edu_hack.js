@@ -1,3 +1,14 @@
+function createShowFunction(i) {
+	return function (e) {
+                var nextRow = i + 1;
+                if (e.target.value.length > 0) {
+                    CRM.$('#td_row_' + nextRow).show();
+                } else {
+                    CRM.$('#td_row_' + nextRow).hide();
+                }
+            }
+}
+
 
 CRM.$(document).ready(function () {
 
@@ -18,20 +29,13 @@ CRM.$(document).ready(function () {
     var at = 0;
     for (var i = 0; i < maxRows; i++) {
         tableHtml += "<tr id='td_row_" + i + "'";
-        if (i > 0 && CRM.$('#custom_' + ids[at]).val().length() == 0) {
-            tableHtml += " style='visibility:hidden'";
+        if (i > 0 && CRM.$('#custom_' + ids[at]).val().length == 0) {
+            tableHtml += " style='display:none'";
         }
         tableHtml += ">";
 
         for (var j = 0; j < itemsPerRow; j++) {
-            CRM.$('#custom_' + ids[at]).onChange(function (e) {
-                var nextRow = i + 1;
-                if (e.val().length > 0) {
-                    CRM.$('#td_row_' + nextRow).show();
-                } else {
-                    CRM.$('#td_row_' + nextRow).hide();
-                }
-            });
+            CRM.$('#custom_' + ids[at]).change(createShowFunction(i));
             tableHtml += "<td id='td_custom_" + ids[at++] + "'></td>";
         }
         tableHtml += "</tr>";
