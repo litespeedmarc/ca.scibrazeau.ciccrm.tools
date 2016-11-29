@@ -7,6 +7,12 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/CCImport</path>
+    <page_callback>CRM_Tools_Page_CCImport</page_callback>
+    <title>CCImport</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
     <path>civicrm/ImportPrices</path>
     <page_callback>CRM_Tools_Form_ImportPrices</page_callback>
     <title>ImportPrices</title>
