@@ -11,22 +11,22 @@ class CRM_Tools_Page_CCImport extends CRM_Core_Page {
     CRM_Utils_System::setTitle(ts('ImportPriceSet'));
 
     $rows = CRM_Core_DAO::executeQuery("
-select distinct con.id, cc_type_id, cc_card_no, cc_card_expiry, cc_card_ccv_no, cc_name_on_card, ac.last_name, ac.first_name
+select distinct con.id, cc_type_id, trim(cc_card_no) as cc_card_no, cc_card_expiry, cc_card_ccv_no, cc_name_on_card, ac.last_name, ac.first_name
     from amsoft.p_memf_preauthorization as amsoft_pap
     		inner join civicrm_contact con on con.external_identifier = amsoft_pap.constit_id
     		inner join amsoft.p_constit ac on ac.constit_id = amsoft_pap.constit_id
     		where not exists(select * from civicrm_cardvault cv where cv.contact_id = con.id)
-    		and cc_card_no is not null
-    		 and length(cc_card_no) > 0
+                  and cc_card_no is not null
+                  and length(trim(cc_card_no)) > 0
 	");
 
     $cnt = 0;
     while ( $rows->fetch()) {
-      $combinedName = $rows['cc_name_on_card'];
-      $firstName = $rows['first_name'];
-      $lastName = $rows['last_name'];
+      $combinedName = $rows->cc_name_on_card;
+      $firstName = $rows->first_name;
+      $lastName = $rows->last_name;
       $this->cleanNames($combinedName, $firstName, $lastName);
-      switch ($rows['cc_type_id']) {
+      switch ($rows->cc_type_id) {
         case 1: $ccType = 'Visa'; break;
         case 2: $ccType = 'MasterCard'; break;
         case 3: $ccType = 'Amex'; break;
@@ -34,21 +34,21 @@ select distinct con.id, cc_type_id, cc_card_no, cc_card_expiry, cc_card_ccv_no, 
           continue;
       }
 
-      $year = substr($rows['cc_card_expiry'], 0, 4);
-      $month = substr($rows['cc_card_expiry'], 5, 2);
+      $year = substr($rows->cc_card_expiry, 0, 4);
+      $month = substr($rows->cc_card_expiry, 5, 2);
 
       $params = [
-        'contact_id' => $rows['id'],
+        'contact_id' => $rows->id,
         'contribution_id' => NULL,
         'invoice_id' => NULL,
         'billing_first_name' => $firstName,
         'billing_last_name' => $lastName,
         'credit_card_type' => $ccType,
-        'credit_card_number' => $rows['cc_card_no'],
-        'cvv2' => $rows['cc_card_ccv_no'],
+        'credit_card_number' => $rows->cc_card_no,
+        'cvv2' => $rows->cc_card_ccv_no,
         'credit_card_expire_month' => $month,
         'credit_card_expire_year' => $year,
-        'currency' => 'CDN',
+        'currency' => 'CAD',
       ];
 
       CRM_Cardvault_BAO_Cardvault::create($params);
