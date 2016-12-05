@@ -16,6 +16,8 @@ select distinct con.id, cc_type_id, cc_card_no, cc_card_expiry, cc_card_ccv_no, 
     		inner join civicrm_contact con on con.external_identifier = amsoft_pap.constit_id
     		inner join amsoft.p_constit ac on ac.constit_id = amsoft_pap.constit_id
     		where not exists(select * from civicrm_cardvault cv where cv.contact_id = con.id)
+    		and cc_card_no is not null
+    		 and length(cc_card_no) > 0
 	");
 
     $cnt = 0;

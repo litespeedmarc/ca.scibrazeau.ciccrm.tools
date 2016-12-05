@@ -1,0 +1,56 @@
+.wiz .address {
+    border: solid 1px #d86d0e;
+    border-radius: 10px;
+}
+
+table.wiz {
+    border:none;
+}
+
+fieldset.wiz > thead {
+}
+
+#step2 > fieldset > div > h3, #step1 > fieldset > h3 {
+    background-color: #ffd387;
+}
+
+
+#phone_ext-Primary-1 {
+    width:60px;
+}
+
+.crm-container th, .crm-container table.display thead th, .crm-container table thead.sticky th, .crm-container table.caseSelector tr.columnheader th  {
+    background-color:#d86d0e;
+    color:white;
+}
+
+#priceset > fieldset {
+    border:none;
+    border-top:none;
+    margin:0px;
+    padding:0px;
+}
+
+#progress { position: relative; height: 10px; background-color: #eee; margin-top: 20px; width:80%; margin: 0 auto; margin-top:20px}
+#progress-complete { border: 0; position: absolute; height: 10px; min-width: 10px; background-color: #d86d0e; transition: width .2s ease-in-out; }
+
+
+fieldset.wiz.crm-container {
+    border:none;
+    border-top:none;
+}
+
+fieldset.wiz {
+    padding: 5px 20px 15px 20px;
+    border-radius: 10px;
+    border: solid #d86d0e;
+    background-color: #fbf3c2;
+}
+
+.stepDetails.commands {
+
+}
+
+.crm-form-submit.next {
+    float:right;
+}

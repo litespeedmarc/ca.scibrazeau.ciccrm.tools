@@ -1,5 +1,3 @@
-<script src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/cic_edu_hack.js"/>
-
 <script>
     {assign var=stateProvKey value="state_province-Primary"}
     
@@ -7,8 +5,9 @@
     {literal}
     CRM.$(document).ready( function() {
 
-	hideEduConfirm();
-        
+        // Too many custom fields, looks ugly.  Just hide it all.
+        CRM.$('div.form-item.crm-section[class*=_custom_').each(function() {CRM.$(this).hide()} );
+
         var taxCalculator = new TaxCalculator();
         taxCalculator.getProvinceId = function() { return "{/literal}{$form.$stateProvKey.value[0]}{literal}"; };
         var taxTerm = taxCalculator.getTaxTerm();

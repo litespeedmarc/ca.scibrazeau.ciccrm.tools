@@ -127,7 +127,7 @@ function tools_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 function tools_civicrm_validateForm($formName, &$submitValues, &$submittedFiles, &$form, &$hookErrors) {
   if ($formName == 'CRM_Contribute_Form_Contribution_Main') {
     if (isTooCurrent('email', $submitValues['email-5'])) {
- 	$source = $submitValues['email-5'];
+ 	$email = $submitValues['email-5'];
       $hookErrors['_qf_default'] = "Your membership is already up-to-date ($email).  It is too early to renew";
     }
 
@@ -178,6 +178,7 @@ function tools_civicrm_buildForm($formName, &$form) {
   // it replaces "hidden_taxes", the label used to trigger the tax logic into
   // something more user friendly (i.e., 'Taxes').  It is done only on
   // Contribution Confirmation & Contribution Thank you pages
+
   if ($formName == 'CRM_Contribute_Form_Contribution_Confirm' ||
         $formName == 'CRM_Contribute_Form_Contribution_ThankYou'
   ) {
