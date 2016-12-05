@@ -13,6 +13,12 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/UserCreate</path>
+    <page_callback>CRM_Tools_Page_UserCreate</page_callback>
+    <title>UserCreate</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
     <path>civicrm/ImportPrices</path>
     <page_callback>CRM_Tools_Form_ImportPrices</page_callback>
     <title>ImportPrices</title>
