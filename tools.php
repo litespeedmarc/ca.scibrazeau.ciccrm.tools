@@ -124,7 +124,7 @@ function tools_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _tools_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
-function tools_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+function tools_civicrm_pre($op, $objectName, $objectId, &$objectRef) {
   if ("create" == "$op" && "Contribution" == "$objectName") {
     $ccType = CRM_Utils_Request::retrieve("credit_card_type", "String",  CRM_Core_DAO::$_nullObject, FALSE, NULL, 'REQUEST');
     if (!$ccType) {
@@ -135,15 +135,10 @@ function tools_civicrm_post($op, $objectName, $objectId, &$objectRef) {
         'sequential' => 1,
         'return' => array("value"),
         'label' => $ccType,
-        'option_group_id' => "accept_creditcard",
+        'option_group_id' => "payment_instrument",
       ));
-      $ccTypeId = $result['values'][0]['value'];
-      if ($ccTypeId) {
-        $result = civicrm_api3('CustomValue', 'create', array(
-          'sequential' => 1,
-          'entity_id' => $objectId,
-          'custom_Contribution Extra:Credit Card Type' => $ccTypeId
-        ));
+      if (!empty($result['values'][0]['value'])) {;
+        $objectRef[payment_instrument_id] = $result['values'][0]['value'];
       }
 
     }
