@@ -2,7 +2,7 @@
 
 require_once 'CRM/Core/Page.php';
 
-class CRM_Tools_Page_CCImport extends CRM_Core_Page {
+class CRM_Tools_Page_UserCreate extends CRM_Core_Page {
 
 public function run() {
     $rows = CRM_Core_DAO::executeQuery("
@@ -11,7 +11,7 @@ select contact_id, email
  where is_primary
    and exists(select * from civicrm_membership mem where mem.contact_id = civicrm_email.contact_id and mem.end_date >= '2014-12-31')
    and email is not null and length(email) > 0
-	and email regexp '^[A-Za-z@0-9._-]{1,}$'
+   and email regexp '^[A-Za-z@0-9._-]{1,}$'
    and not exists(select * from users u where u.name = email COLLATE utf8_unicode_ci )
 group by email having count(*) = 1
    ");
@@ -32,13 +32,12 @@ $cnt = 0;
       ];
 
       CRM_Core_BAO_CMSUser::create($params, 'email');
-$cnt++;
+      $cnt++;
     }
 
-$this->assign('importCount', $cnt);
+  $this->assign('importCount', $cnt);
 
-parent::run();
-
+  parent::run();
   }
 
 
