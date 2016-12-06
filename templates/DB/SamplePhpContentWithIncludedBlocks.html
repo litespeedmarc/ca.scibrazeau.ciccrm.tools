@@ -1,0 +1,42 @@
+<link rel="stylesheet" type="text/css"  href="https://cividev.cheminst.ca/sites/cividev.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/css/member_portal.css"/>
+<script type="text/javascript" src="https://cividev.cheminst.ca/sites/cividev.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/jquery-ui.min.js"></script>
+<script>
+    jQuery(document).ready(function($) {
+
+                $('ul.tabs').delegate('li:not(.current)', 'click', function() {
+                    $(this).addClass('current').siblings().removeClass('current')
+                        .parents('div.section').find('div.box').eq($(this).index()).fadeIn(150).siblings('div.box').hide();
+                })
+    });
+</script>
+<div id="main_profile_tabs" class="section">
+    <ul class="tabs">
+        <li class="current">Personal Information</li>
+        <li class="current">Education</li>
+        <li class="current">Professional Experience</li>
+        <li class="current">Divisions</li>
+    </ul>
+    <div id="#personal_information_tab" class="box visible">
+        <?php
+            $block = module_invoke('webform', 'block_view', 'client-block-4');
+            print render($block['content']);
+        ?>
+    </div>
+    <div id="#education_tab" class="box">
+        This to be replaced with Education Tab, if you know the client-block-4 (from your browser's URL, let me know!!)'
+    </div>
+    <div id="#professional_experience_tab" class="box">
+        This to be replaced with Professional Experience Tab, if you know the client-block-4 (from your browser's URL, let me know!!)'
+    </div>
+    <div id="#divisions_tab" class="box">
+        This to be replaced with Divisions Tab, if you know the client-block-4 (from your browser's URL, let me know!!)'
+        <?php
+            $block = module_invoke('webform', 'block_view', 'client-block-4');
+            print render($block['content']);
+        ?>
+    </div>
+
+</div>
+
+
+
