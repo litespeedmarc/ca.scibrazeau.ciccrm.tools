@@ -158,7 +158,7 @@ function tools_civicrm_alterMailParams(&$params, $context) {
     // add cic prefixed items to faciliate finding things
     $contact = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
-      'return' => array("custom_13", "custom_15", "street_address", "supplemental_address_1", "supplemental_address_2", "city", "postal_code", "state_province_name", "country"),
+      'return' => array("custom_13", "custom_15", "street_address", "supplemental_address_1", "supplemental_address_2", "city", "postal_code", "state_province", "state_province_name", "country"),
       'id' => $params['tplParams']['contactID']
     ))['values'][0];
 
@@ -167,7 +167,7 @@ function tools_civicrm_alterMailParams(&$params, $context) {
                $contact['supplemental_address_2'] . "\n" .
                $contact['city'] . ', ' . $contact['state_province'] . "\n" .
                $contact['postal_code'] . ' ' . $contact['country'];
-    $address = trim(preg_replace("/CANADA$/s", "", $address));
+    $address = trim(preg_replace("/Canada$/si", "", $address));
     $address = preg_replace( "/\n{1,}/s", "\n", $address);
 
     // lookup primary division
