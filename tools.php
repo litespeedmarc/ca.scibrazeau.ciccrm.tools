@@ -159,7 +159,7 @@ function tools_civicrm_alterMailParams(&$params, $context) {
     $contact = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
       'return' => array("custom_13", "custom_15", "street_address", "supplemental_address_1", "supplemental_address_2", "city", "postal_code", "state_province_name", "country"),
-      'id' => $params['tplParams']['contact_id']
+      'id' => $params['tplParams']['contactID']
     ))['values'][0];
 
     $address = $contact['street_address'] . "\n" .

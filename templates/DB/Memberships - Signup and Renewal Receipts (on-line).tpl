@@ -41,7 +41,7 @@
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Mailing Address{/ts} : </td>
-        <td {$valueStyle3}>{$address}</td>
+        <td {$valueStyle3}>{$address|nl2br}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Member #{/ts} : </td>
