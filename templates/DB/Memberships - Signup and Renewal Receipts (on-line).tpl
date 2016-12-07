@@ -5,6 +5,63 @@
     <title></title>
 </head>
 <body style='font-family: Verdana,Geneva,sans-serif;'>
+
+
+{**                                                                           **}
+{**                                                                           **}
+{**  SCROLL TO  BUNCH OF ********************s for main formatting Start      **}
+{**                                                                           **}
+{**                                                                           **}
+
+{* TODO: Move to a hook or something, too much "getting" logic here *}
+{* standardize field names between online & offline *}
+{* we check standard "online" names.  And if empty, we get from their equivalent offline names *}
+{if empty($contact_id)}
+    {assign var="contact_id" value=$contactID}
+{/if}
+{if empty($amount)}
+    {assign var='amount' value=$formValues.total_amount}
+{/if}
+
+{* Load contact no matter what, allowing for consistent template below *}
+{crmAPI var='result' entity='Contact' action='get' id=$contact_id}
+{assign var='contact' value=$result.values[0]}
+
+{* Ditto for contribution, need some stuff that's not available on smarty template assigned already *}
+{crmAPI var='result' entity='Contribution' action='get' id=$contributionID}
+{assign var='contrib' value=$result.values[0]}
+
+{crmAPI var='result' entity='OptionValue' action='get' return="label" option_group_id="payment_instrument" value=$contrib.instrument_id}
+{assign var='payment_instrument' value=$result.values[0].label}
+
+
+{* Ditto for Custom Fields *}
+{crmAPI var='result' entity='CustomValue' action='get' entity_id=$contact_id}
+{foreach from=$result.values item=customValue}
+    {if $customValue.id eq 13}
+        {assign var='primary_division' value=$customValue[0]}
+    {/if}
+    {if $customValue.id eq 15}
+        {assign var='additional_divisions' value=$customValue[0]}
+    {/if}
+{/foreach}
+
+{* Custom Fields gets more complicated, we need to lookup what each code means *}
+{if !empty($primary_division)}
+    {crmAPI var='result' entity='OptionValue' action='get' return="label" option_group_id="primary_division_20160912142401" value=$primary_division}
+    {assign var='primary_division' value=$result.values[0].label}
+{/if}
+{if !empty($additional_divisions)}
+    {capture assign=add_div}
+        {foreach from=$additional_divisions item=div}
+            {crmAPI var='result' entity='OptionValue' action='get' return="label" option_group_id="additional_divisions_20160912143714" value=$div}
+            {$result.values[0].label}<br/>
+        {/foreach}
+    {/capture}
+{/if}
+
+
+{**   Set some constants for easier html manipulation, below **}
 {capture assign=font}font-family: Verdana,Geneva,sans-serif; font-size:10pt;{/capture}
 {capture assign=headerStyle1}style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee; {$font}"{/capture}
 {capture assign=headerStyle3}colspan="3" {$headerStyle1}{/capture}
@@ -12,33 +69,43 @@
 {capture assign=labelStyle1 }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7; text-align:right; {$font}"{/capture}
 {capture assign=valueStyle1 }style="padding: 4px; border-bottom: 1px solid #999; {$font}"{/capture}
 {capture assign=valueStyle3 }colspan=3 {$valueStyle1}{/capture}
-{assign var='address1' value='Street Address'}
-{assign var='address2' value='Supplemental Address 1'}
-{assign var='address3' value='Supplemental Address 2'}
-{assign var='city'     value='City'}
-{assign var='prov'     value='Province/State'}
-{assign var='postal'   value='Postal/Zip Code'}
 {assign var='prim_div' value='Primary Division'}
 {assign var='addi_div' value='Additional Divisions'}
 {capture assign=full_address}
-    {$customPre.$address1}
-    {if !empty($customPre.$address2)}<br/>{$customPre.$address2}{/if}
-    {if !empty($customPre.$address3)}<br/>{$customPre.$address3}{/if}
-    <br/>{$customPre.City}, {$customPre.$prov}
-    {if $customPre.Country ne "Canada"}<br/>{$customPre.$Country}{/if}
+    {if !empty($contact.street_address)}{$contact.street_address}<br/>{/if}
+    {if !empty($contact.supplemental_address1)}{$contact.supplemental_address1}<br/>{/if}
+    {if !empty($contact.supplemental_address2)}{$contact.supplemental_address2}<br/>{/if}
+    {$contact.city}, {$contact.$state_province}
+    {if $contact.country ne "Canada"}<br/>{$customPre.$country}{/if}
 {/capture}
 
 
-
-
-{assign var='join_date' value=""}
-{foreach from=$lineItem item=value key=priceset}
-    {foreach from=$value item=line}
-        {if !empty($line.join_date)}
-            {assign var='join_date' value=$line.join_date}
-        {/if}
+{assign var='join_date' value=$formValues.join_date}
+{if empty($join_date)}
+    {foreach from=$lineItem item=value key=priceset}
+        {foreach from=$value item=line}
+            {if !empty($line.join_date)}
+                {assign var='join_date' value=$line.join_date}
+            {/if}
+        {/foreach}
     {/foreach}
-{/foreach}
+{/if}
+
+
+
+
+{*************************************************** *}
+{*************************************************** *}
+{*************************************************** *}
+
+{*               HTML START                          *}
+
+{*************************************************** *}
+{*************************************************** *}
+{*************************************************** *}
+
+
+
 
 <div>
     <img alt="" src="https://cividev.cheminst.ca/sites/cividev.cheminst.ca/files/civicrm/persist/contribute/images/2016_MembershipReceipt_Header.jpg" style="width: 650px; height: 145px;" /></td>
@@ -53,11 +120,11 @@
     </tr>
     <tr>
         <td {$labelStyle1} width=25%>{ts}Name{/ts} : </td>
-        <td {$valueStyle3}>{$displayName}</td>
+        <td {$valueStyle3}>{$contact.display_name}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Email Address{/ts} : </td>
-        <td {$valueStyle3}>{$email}</td>
+        <td {$valueStyle3}>{$contact.email}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Mailing Address{/ts} : </td>
@@ -65,7 +132,7 @@
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Member #{/ts} : </td>
-        <td {$valueStyle3}>CIV_{$contactID}</td>
+        <td {$valueStyle3}>CIV_{$contact_id}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Member Since{/ts} : </td>
@@ -73,11 +140,11 @@
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Primary Division{/ts} : </td>
-        <td {$valueStyle3}>{$customPre.$prim_div}</td>
+        <td {$valueStyle3}>{$primary_division}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Additional Divisions{/ts} : </td>
-        <td {$valueStyle3}>{$customPre.$addi_div}</td>
+        <td {$valueStyle3}>{$add_div}</td>
     </tr>
 </table>
 
@@ -99,25 +166,51 @@
     {if $receive_date}
         <tr>
             <td {$labelStyle1}>{ts}Date Received{/ts} : </td>
-            <td {$valueStyle3}>{$receive_date|truncate:10:''|crmDate}</td>
+            <td {$valueStyle3}>{$contrib.receive_date}</td>
         </tr>
     {/if}
 
-    <!-- Paid By (e.g., Cheque, Credit Card, etc... -->
-    {if $formValues.paidBy}
+    {* Paid By (e.g., Cheque, Credit Card, etc... *}
+    <tr>
+        <td {$labelStyle1}>{ts}Paid By{/ts} : </td>
+        <td {$valueStyle3}>{$payment_instrument}</td>
+    </tr>
+
+    {* Check Number (when paid by check) *}
+    {if $contribution.check_number}
         <tr>
-            <td {$labelStyle1}>{ts}Paid By{/ts} : </td>
-            <td {$valueStyle3}>{$formValues.paidBy}</td>
+            <td {$labelStyle1}>{ts}Check Number{/ts} : </td>
+            <td {$valueStyle3}>{$formValues.check_number}</td>
         </tr>
-
-        <!-- Check Number (when paid by check) -->
-        {if $formValues.check_number}
-            <tr>
-                <td {$labelStyle1}>{ts}Check Number{/ts} : </td>
-                <td {$valueStyle3}>{$formValues.check_number}</td>
-            </tr>
-        {/if}
     {/if}
+
+    {if $cc_number}
+        <tr>
+            {* This is compliant (http://stackoverflow.com/questions/1485442/storing-partial-credit-card-numbers) *}
+            <td {$labelStyle1}>{ts}Card Number{/ts} : </td>
+            <td {$valueStyle3}>{$cc_number}</td>
+        </tr>
+    {/if}
+
+    {* These should always be present *}
+    <tr>
+        <td {$labelStyle1}>{ts}Transaction #{/ts}:</td>
+        <td {$valueStyle3}>{$contrib.trxn_id}</td>
+    </tr>
+
+    <tr>
+        <td {$labelStyle1}>{ts}Invoice Id{/ts}</td>
+        <td {$valueStyle3}>{$contrib.invoice_id}</td>
+    </tr>
+
+    {* At CIC, this only makes sense a price set level, so leaving out
+    {if $membership_trx_id}
+        <tr>
+            <td {$labelStyle1}>{ts}Membership Transaction #{/ts}</td>
+            <td {$valueStyle3}>{$membership_trx_id}</td>
+        </tr>
+    {/if} *}
+
 </table>
 
 <br/>
