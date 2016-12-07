@@ -24,8 +24,6 @@
     <img alt="" src="https://cividev.cheminst.ca/sites/cividev.cheminst.ca/files/civicrm/persist/contribute/images/2016_MembershipReceipt_Header.jpg" style="width: 650px; height: 145px;" /></td>
 </div>
 
-<br/>
-
 <table style='width: 650px'>
     <!-- Member Details -->
     <tr>
@@ -61,8 +59,6 @@
     </tr>
 </table>
 
-<br/>
-
 
 <table style='width: 650px'>
     <!-- Membership Details -->
@@ -86,34 +82,21 @@
     {* Paid By (e.g., Cheque, Credit Card, etc... *}
     <tr>
         <td {$labelStyle1}>{ts}Paid By{/ts} : </td>
-        <td {$valueStyle3}>{$payment_instrument}</td>
-    </tr>
-
-    {* Check Number (when paid by check) *}
-    {if $contribution.check_number}
-        <tr>
-            <td {$labelStyle1}>{ts}Check Number{/ts} : </td>
-            <td {$valueStyle3}>{$check_number}</td>
+        <td {$valueStyle3}>{$payment_instrument}&nbsp;&nbsp;
+            {* Check Number (when paid by check) *}
+            {if $contribution.check_number}
+                #&nbsp;{$check_number}
+            {/if}
+            {if $cc_number}
+                {* This is compliant (http://stackoverflow.com/questions/1485442/storing-partial-credit-card-numbers) *}
+                {$cc_number}
+            {/if}
         </tr>
-    {/if}
-
-    {if $cc_number}
-        <tr>
-            {* This is compliant (http://stackoverflow.com/questions/1485442/storing-partial-credit-card-numbers) *}
-            <td {$labelStyle1}>{ts}Card Number{/ts} : </td>
-            <td {$valueStyle3}>{$cc_number}</td>
-        </tr>
-    {/if}
 
     {* These should always be present *}
     <tr>
         <td {$labelStyle1}>{ts}Transaction #{/ts}:</td>
-        <td {$valueStyle3}>{$trxn_id}</td>
-    </tr>
-
-    <tr>
-        <td {$labelStyle1}>{ts}Invoice Id{/ts}</td>
-        <td {$valueStyle3}>{$invoice_id}</td>
+        <td {$valueStyle3}>{$trxn_id} &nbsp; &nbsp; &nbsp; /  &nbsp; &nbsp; &nbsp;{$invoice_id}</td>
     </tr>
 
     {* At CIC, this only makes sense a price set level, so leaving out
@@ -125,8 +108,6 @@
     {/if} *}
 
 </table>
-
-<br/>
 
 <table style='width: 650px'>
     <!-- Membership Fees -->
@@ -178,7 +159,7 @@
 
 </table>
 
-<br/><br/>
+<br/>
 {if $formValues.receipt_text_signup}
     <p>{$formValues.receipt_text_signup|htmlize}</p>
 
