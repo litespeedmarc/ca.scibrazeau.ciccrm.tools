@@ -12,7 +12,7 @@
 {capture assign=headerStyle1}style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee; {$font}"{/capture}
 {capture assign=headerStyle3}colspan="3" {$headerStyle1}{/capture}
 {capture assign=headerStyle4}colspan="4" {$headerStyle1}{/capture}
-{capture assign=labelStyle1 }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7; text-align:right; {$font}"{/capture}
+{capture assign=labelStyle1 }style="padding: 4px; border-bottom: 2px solid #999; background-color: #f7f7f7; text-align:right; {$font}"{/capture}
 {capture assign=valueStyle1 }style="padding: 4px; border-bottom: 1px solid #999; {$font}"{/capture}
 {capture assign=valueStyle3 }colspan=3 {$valueStyle1}{/capture}
 
@@ -33,19 +33,19 @@
     </tr>
     <tr>
         <td {$labelStyle1} width=25%>{ts}Name{/ts} : </td>
-        <td {$valueStyle3}>{$contact.display_name}</td>
+        <td {$valueStyle3}>{$displayName}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Email Address{/ts} : </td>
-        <td {$valueStyle3}>{$contact.email}</td>
+        <td {$valueStyle3}>{$email}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Mailing Address{/ts} : </td>
-        <td {$valueStyle3}>{$full_address}</td>
+        <td {$valueStyle3}>{$address}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Member #{/ts} : </td>
-        <td {$valueStyle3}>CIV_{$contact_id}</td>
+        <td {$valueStyle3}>CIV_{$contactID}</td>
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Member Since{/ts} : </td>
@@ -57,7 +57,7 @@
     </tr>
     <tr>
         <td {$labelStyle1}>{ts}Additional Divisions{/ts} : </td>
-        <td {$valueStyle3}>{$add_div}</td>
+        <td {$valueStyle3}>{$additional_divisions}</td>
     </tr>
 </table>
 
@@ -79,7 +79,7 @@
     {if $receive_date}
         <tr>
             <td {$labelStyle1}>{ts}Date Received{/ts} : </td>
-            <td {$valueStyle3}>{$contrib.receive_date}</td>
+            <td {$valueStyle3}>{$receive_date}</td>
         </tr>
     {/if}
 
@@ -93,7 +93,7 @@
     {if $contribution.check_number}
         <tr>
             <td {$labelStyle1}>{ts}Check Number{/ts} : </td>
-            <td {$valueStyle3}>{$formValues.check_number}</td>
+            <td {$valueStyle3}>{$check_number}</td>
         </tr>
     {/if}
 
@@ -108,12 +108,12 @@
     {* These should always be present *}
     <tr>
         <td {$labelStyle1}>{ts}Transaction #{/ts}:</td>
-        <td {$valueStyle3}>{$contrib.trxn_id}</td>
+        <td {$valueStyle3}>{$trxn_id}</td>
     </tr>
 
     <tr>
         <td {$labelStyle1}>{ts}Invoice Id{/ts}</td>
-        <td {$valueStyle3}>{$contrib.invoice_id}</td>
+        <td {$valueStyle3}>{$invoice_id}</td>
     </tr>
 
     {* At CIC, this only makes sense a price set level, so leaving out

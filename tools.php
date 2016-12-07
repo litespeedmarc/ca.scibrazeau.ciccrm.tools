@@ -204,6 +204,8 @@ select max(join_date)
     $params['tplParams']['payment_instrument'] = $contrib['payment_instrument'];
     $params['tplParams']['invoice_id'] = $contrib['invoice_id'];
     $params['tplParams']['receive_date'] = $contrib['receive_date'];
+    $params['tplParams']['trxn_id'] = $contrib['trxn_id'];
+    $params['tplParams']['check_number'] = $contrib['check_number'];
 
   }
 
