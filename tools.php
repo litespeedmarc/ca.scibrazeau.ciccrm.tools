@@ -140,8 +140,71 @@ function tools_civicrm_pre($op, $objectName, $objectId, &$objectRef) {
       if (!empty($result['values'][0]['value'])) {;
         $objectRef[payment_instrument_id] = $result['values'][0]['value'];
       }
-
     }
+  }
+}
+
+function tools_civicrm_alterMailParams(&$params, $context) {
+  if ("messageTemplate" != $context) {
+    return;
+  }
+  if ( (empty($params['tplParams']['contactID'])) && !empty($params['tplParams']['contact_id']) ) {
+    $params['tplParams']['contactID'] = $params['tplParams']['contact_id'];
+  }
+
+  if (!empty($params['tplParams']['contactID'])) {
+    $prim_div_cf_name = CRM_Core_BAO_CustomField::getFieldValue("CRM_Core_BAO_CustomField", 'Primary_Division', 'id', "name", true);
+    $addi_div_cf_name = CRM_Core_BAO_CustomField::getFieldValue("CRM_Core_BAO_CustomField", 'Additional_Divisions', 'id', "name", true);
+    // add cic prefixed items to faciliate finding things
+    $contact = civicrm_api3('Contact', 'get', array(
+      'sequential' => 1,
+      'return' => array("custom_13", "custom_15", "street_address", "supplemental_address_1", "supplemental_address_2", "city", "postal_code", "state_province_name", "country"),
+      'id' => $params['tplParams']['contact_id']
+    ))['values'][0];
+
+    $address = $contact['street_address'] . "\n" .
+               $contact['supplemental_address_1'] . "\n" .
+               $contact['supplemental_address_2'] . "\n" .
+               $contact['city'] . ', ' . $contact['state_province'] . "\n" .
+               $contact['postal_code'] . ' ' . $contact['country'];
+    $address = trim(preg_replace("/CANADA$/s", "", $address));
+    $address = preg_replace( "/\n{1,}/s", "\n", $address);
+
+    // lookup primary division
+    $prim_div = CRM_Core_BAO_CustomField::displayValue($contact["custom_$prim_div_cf_name"], $prim_div_cf_name);
+    $addi_div = CRM_Core_BAO_CustomField::displayValue($contact["custom_$addi_div_cf_name"], $addi_div_cf_name);
+
+    // custom logic for CIC, all people have a join date... their latest one
+    $join_date = CRM_core_DAO::singleValueQuery("
+select max(join_date)
+ from civicrm_membership
+  where membership_type_id in (
+  			select civicrm_membership_type.id from civicrm_membership_type, civicrm_contact c
+  				where c.id = member_of_contact_id
+  				  and c.display_name in ('CSC', 'CSChE', 'CSCT')
+  				  )
+ 	and status_id in (select s.id from civicrm_membership_status as s where is_current_member = 1)
+ 	and contact_id = " . $params['tplParams']['contactID']);
+
+    $params['tplParams']['join_date'] = $join_date;
+    $params['tplParams']['address'] = $address;
+    $params['tplParams']['primary_division'] = $prim_div;
+    $params['tplParams']['additional_divisions'] = $addi_div;
+
+  }
+
+
+  if (!empty($params['tplParams']['contributionID'])) {
+    // add cic prefixed items to faciliate finding things
+    $contrib = $result = civicrm_api3('Contribution', 'get', array(
+      'sequential' => 1,
+      'id' => $params['tplParams']['contributionID'],
+    ))['values'][0];
+
+    $params['tplParams']['payment_instrument'] = $contrib['payment_instrument'];
+    $params['tplParams']['invoice_id'] = $contrib['invoice_id'];
+    $params['tplParams']['receive_date'] = $contrib['receive_date'];
+
   }
 
 }

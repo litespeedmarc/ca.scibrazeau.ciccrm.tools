@@ -7,60 +7,6 @@
 <body style='font-family: Verdana,Geneva,sans-serif;'>
 
 
-{**                                                                           **}
-{**                                                                           **}
-{**  SCROLL TO  BUNCH OF ********************s for main formatting Start      **}
-{**                                                                           **}
-{**                                                                           **}
-
-{* TODO: Move to a hook or something, too much "getting" logic here *}
-{* standardize field names between online & offline *}
-{* we check standard "online" names.  And if empty, we get from their equivalent offline names *}
-{if empty($contact_id)}
-    {assign var="contact_id" value=$contactID}
-{/if}
-{if empty($amount)}
-    {assign var='amount' value=$formValues.total_amount}
-{/if}
-
-{* Load contact no matter what, allowing for consistent template below *}
-{crmAPI var='result' entity='Contact' action='get' id=$contact_id}
-{assign var='contact' value=$result.values[0]}
-
-{* Ditto for contribution, need some stuff that's not available on smarty template assigned already *}
-{crmAPI var='result' entity='Contribution' action='get' id=$contributionID}
-{assign var='contrib' value=$result.values[0]}
-
-{crmAPI var='result' entity='OptionValue' action='get' return="label" option_group_id="payment_instrument" value=$contrib.instrument_id}
-{assign var='payment_instrument' value=$result.values[0].label}
-
-
-{* Ditto for Custom Fields *}
-{crmAPI var='result' entity='CustomValue' action='get' entity_id=$contact_id}
-{foreach from=$result.values item=customValue}
-    {if $customValue.id eq 13}
-        {assign var='primary_division' value=$customValue[0]}
-    {/if}
-    {if $customValue.id eq 15}
-        {assign var='additional_divisions' value=$customValue[0]}
-    {/if}
-{/foreach}
-
-{* Custom Fields gets more complicated, we need to lookup what each code means *}
-{if !empty($primary_division)}
-    {crmAPI var='result' entity='OptionValue' action='get' return="label" option_group_id="primary_division_20160912142401" value=$primary_division}
-    {assign var='primary_division' value=$result.values[0].label}
-{/if}
-{if !empty($additional_divisions)}
-    {capture assign=add_div}
-        {foreach from=$additional_divisions item=div}
-            {crmAPI var='result' entity='OptionValue' action='get' return="label" option_group_id="additional_divisions_20160912143714" value=$div}
-            {$result.values[0].label}<br/>
-        {/foreach}
-    {/capture}
-{/if}
-
-
 {**   Set some constants for easier html manipulation, below **}
 {capture assign=font}font-family: Verdana,Geneva,sans-serif; font-size:10pt;{/capture}
 {capture assign=headerStyle1}style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee; {$font}"{/capture}
@@ -69,42 +15,9 @@
 {capture assign=labelStyle1 }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7; text-align:right; {$font}"{/capture}
 {capture assign=valueStyle1 }style="padding: 4px; border-bottom: 1px solid #999; {$font}"{/capture}
 {capture assign=valueStyle3 }colspan=3 {$valueStyle1}{/capture}
-{assign var='prim_div' value='Primary Division'}
-{assign var='addi_div' value='Additional Divisions'}
-{capture assign=full_address}
-    {if !empty($contact.street_address)}{$contact.street_address}<br/>{/if}
-    {if !empty($contact.supplemental_address1)}{$contact.supplemental_address1}<br/>{/if}
-    {if !empty($contact.supplemental_address2)}{$contact.supplemental_address2}<br/>{/if}
-    {$contact.city}, {$contact.$state_province}
-    {if $contact.country ne "Canada"}<br/>{$customPre.$country}{/if}
-{/capture}
 
-
-{assign var='join_date' value=$formValues.join_date}
-{if empty($join_date)}
-    {foreach from=$lineItem item=value key=priceset}
-        {foreach from=$value item=line}
-            {if !empty($line.join_date)}
-                {assign var='join_date' value=$line.join_date}
-            {/if}
-        {/foreach}
-    {/foreach}
-{/if}
-
-
-
-
-{*************************************************** *}
-{*************************************************** *}
-{*************************************************** *}
-
-{*               HTML START                          *}
-
-{*************************************************** *}
-{*************************************************** *}
-{*************************************************** *}
-
-
+{** NOte... CIC specific values set in tools.php **}
+{** Also, cardvault.php sets credit card number  **}
 
 
 <div>
