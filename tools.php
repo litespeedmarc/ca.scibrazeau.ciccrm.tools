@@ -145,7 +145,7 @@ function tools_civicrm_pre($op, $objectName, $objectId, &$objectRef) {
         'option_group_id' => "payment_instrument",
       ));
       if (!empty($result['values'][0]['value'])) {;
-        $objectRef[payment_instrument_id] = $result['values'][0]['value'];
+        $objectRef['payment_instrument_id'] = $result['values'][0]['value'];
       }
     }
   }
