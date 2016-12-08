@@ -26,12 +26,21 @@ public function run() {
 
     $cnt = 0;
     foreach ($contacts as $contact_id=>$ignored) {
+
       $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contact_id);
+
+Civi::log()->info(ts('Creating drupal user account for %1, e-mail == %2', [
+      1 => $contact_id,
+      2 => $email,
+    ]));
+
       if (!$email) {
+Civi::log()->info(ts('Skipping, no email'));
         CRM_Core_Session::setStatus("Contact $contact_id does not have an e-mail. No account created", "Warning", 'error');
         continue;
       }
-      if (preg_match("^[A-Za-z@0-9._-]{1,}$", $email)) {
+      if (!preg_match("/^[A-Za-z@0-9._-]{1,}$/", $email)) {
+Civi::log()->info(ts('Skipping, bad email'));
         CRM_Core_Session::setStatus("Contact $contact_id's email ($email) is invalid. No account created");
         continue;
       }
@@ -39,6 +48,7 @@ public function run() {
       $params =  [ 1 => [$email, 'String']];
       $has = CRM_Core_DAO::singleValueQuery("select 1 from users u where u.name = %1", $params);
       if ($has) {
+Civi::log()->info(ts('Skipping, exists '));
         CRM_Core_Session::setStatus("A drupal user already exists for contact $contact_id.  No account created", [ 'expire' => 10 ]);
         continue;
       }
@@ -52,7 +62,11 @@ public function run() {
         'contactID' => $contact_id
       ];
 
+Civi::log()->info(ts('Creating'));
       CRM_Core_BAO_CMSUser::create($params, 'email');
+
+Civi::log()->info(ts('Created'));
+
       $cnt++;
     }
 
