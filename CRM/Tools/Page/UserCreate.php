@@ -5,22 +5,43 @@ require_once 'CRM/Core/Page.php';
 class CRM_Tools_Page_UserCreate extends CRM_Core_Page {
 
 public function run() {
-    $rows = CRM_Core_DAO::executeQuery("
-select contact_id, email
-  from civicrm_email 
- where is_primary
-   and exists(select * from civicrm_membership mem where mem.contact_id = civicrm_email.contact_id and mem.end_date >= '2014-12-31')
-   and email is not null and length(email) > 0
-   and email regexp '^[A-Za-z@0-9._-]{1,}$'
-   and not exists(select * from users u where u.name = email COLLATE utf8_unicode_ci )
-group by email having count(*) = 1
-   ");
+
+  // Example: Set the page-title dynamically; alternatively, declare a static title in xml/Menu/*.xml
+  CRM_Utils_System::setTitle(ts('Create User Accounts'));
+
+  if (isset($_GET["smartGroupId"])) {
+    $this->createUsersForContactsInGroup($_GET["smartGroupId"]);
+  }
+
+  $this->showForm();
+
+  parent::run();
 
 
-$cnt = 0;
-    while ($rows->fetch()) {
-      $email = $rows->email;
-      $contact_id = $rows->contact_id;
+  }
+
+  private function createUsersForContactsInGroup($smartGroupId) {
+
+    $contacts = CRM_Contact_BAO_Group::getGroupContacts($smartGroupId);
+
+    $cnt = 0;
+    foreach ($contacts as $contact_id=>$ignored) {
+      $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contact_id);
+      if (!$email) {
+        CRM_Core_Session::setStatus("Contact $contact_id does not have an e-mail. No account created", "Warning", 'error');
+        continue;
+      }
+      if (preg_match("^[A-Za-z@0-9._-]{1,}$", $email)) {
+        CRM_Core_Session::setStatus("Contact $contact_id's email ($email) is invalid. No account created");
+        continue;
+      }
+
+      $params =  [ 1 => [$email, 'String']];
+      $has = CRM_Core_DAO::singleValueQuery("select 1 from users u where u.name = %1", $params);
+      if ($has) {
+        CRM_Core_Session::setStatus("A drupal user already exists for contact $contact_id.  No account created", [ 'expire' => 10 ]);
+        continue;
+      }
 
       $params = [
         'name' => $email,
@@ -35,9 +56,15 @@ $cnt = 0;
       $cnt++;
     }
 
-  $this->assign('importCount', $cnt);
+    $this->assign('importCount', $cnt);
+  }
 
-  parent::run();
+  private function showForm() {
+    $result = civicrm_api3('Group', 'get', array(
+      'sequential' => 1,
+    ))['values'];
+
+    $this->assign('smartGroups', $result);
   }
 
 
