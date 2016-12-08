@@ -28,9 +28,10 @@ public function run() {
     ))['values'];
 
     $cnt = 0;
-    foreach ($contacts as $contact_id=>$ignored) {
+    foreach ($contacts as $idx=>$contact) {
 
-      $email = $contacts['email'];
+      $contact_id = $contact['id'];
+      $email = $contact['email'];
 
 Civi::log()->info(ts('Creating drupal user account for %1, e-mail == %2', [
       1 => $contact_id,
@@ -39,12 +40,12 @@ Civi::log()->info(ts('Creating drupal user account for %1, e-mail == %2', [
 
       if (!$email) {
 Civi::log()->info(ts('Skipping, no email'));
-        CRM_Core_Session::setStatus("Contact $contact_id does not have an e-mail. No account created", "Warning", 'error');
+        CRM_Core_Session::setStatus("Contact $contact_id does not have an e-mail. No account created", "Warning");
         continue;
       }
       if (!preg_match("/^[A-Za-z@0-9._-]{1,}$/", $email)) {
 Civi::log()->info(ts('Skipping, bad email'));
-        CRM_Core_Session::setStatus("Contact $contact_id's email ($email) is invalid. No account created");
+        CRM_Core_Session::setStatus("Contact $contact_id's email ($email) is invalid. No account created", "Warning");
         continue;
       }
 
