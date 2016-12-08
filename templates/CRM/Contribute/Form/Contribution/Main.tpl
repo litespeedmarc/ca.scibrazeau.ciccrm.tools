@@ -10,9 +10,10 @@
 
 *}
 {* Callback snippet: On-behalf profile *}
-<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.js"></script>
-<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.js"></script>
-<script type="application/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/additional-methods.js"></script>
+
+<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/jquery.js"></script>
+<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/jquery.validate.js"></script>
+<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/additional-methods.js"></script>
 
 {assign var=eduRows value=5}
 
@@ -147,6 +148,10 @@
             <div class="crm-public-form-item crm-section">
                 {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="makeContribution"}
             </div>
+
+<br/>
+            {include fieldName='custom_52'         file="CRM/Contribute/Form/Contribution/BlockField.tpl" profileFields=$customPre}
+
         </fieldset>
 
         <fieldset class="wiz">

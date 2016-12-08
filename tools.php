@@ -194,7 +194,9 @@ select max(join_date)
  	and contact_id = " . $params['tplParams']['contactID']);
 
     $params['tplParams']['join_date'] = $join_date;
+    if ($address) {
     $params['tplParams']['address'] = $address;
+    }
     $params['tplParams']['primary_division'] = $prim_div;
     $params['tplParams']['additional_divisions'] = $addi_div;
 
