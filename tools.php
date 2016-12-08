@@ -130,6 +130,13 @@ function tools_civicrm_pre($op, $objectName, $objectId, &$objectRef) {
     if (!$ccType) {
       $ccType = CRM_Utils_Request::retrieve("credit_card_type", "String",  CRM_Core_DAO::$_nullObject, NULL, NULL, 'POST');
     }
+    if (!$ccType) {
+      $qfKey = CRM_Utils_Request::retrieve("qfKey", "String",  CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+      $session = &CRM_Core_Session::singleton( );
+      $values = $session->get("CRM_Contribute_Controller_Contribution_$qfKey");
+      $values = $values['params'];
+      $ccType = $values['credit_card_type'];
+    }
     if ($ccType) {
       $result = civicrm_api3('OptionValue', 'get', array(
         'sequential' => 1,
