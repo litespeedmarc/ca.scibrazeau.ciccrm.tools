@@ -22,12 +22,15 @@ public function run() {
 
   private function createUsersForContactsInGroup($smartGroupId) {
 
-    $contacts = CRM_Contact_BAO_Group::getGroupContacts($smartGroupId);
+    $contacts = civicrm_api3('Contact', 'get', array(
+      'sequential' => 1,
+      'group' => $smartGroupId,
+    ))['values'];
 
     $cnt = 0;
     foreach ($contacts as $contact_id=>$ignored) {
 
-      $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contact_id);
+      $email = $contacts['email'];
 
 Civi::log()->info(ts('Creating drupal user account for %1, e-mail == %2', [
       1 => $contact_id,
