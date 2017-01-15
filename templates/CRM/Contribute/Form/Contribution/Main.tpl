@@ -242,7 +242,7 @@
             } else if (countryId == 1039) {
                 return /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(value);
             } else {
-                return false;
+                return true;
             }
         }, "This postal code is not valid.");
 
