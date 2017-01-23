@@ -1,7 +1,13 @@
 {literal}
+<!--    
     <script type="application/javascript" src="/sites/default/files/civicrm/ext/ca.scibrazeau.ciccrm.tools/js/jquery.js"></script>
     <script type="application/javascript" src="/sites/default/files/civicrm/ext/ca.scibrazeau.ciccrm.tools/js/jquery.validate.js"></script>
     <script type="application/javascript" src="/sites/default/files/civicrm/ext/ca.scibrazeau.ciccrm.tools/js/additional-methods.js"></script>
+-->
+<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/jquery.js"></script>
+<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/jquery.validate.js"></script>
+<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/additional-methods.js"></script>
+
 
     <script>
 
