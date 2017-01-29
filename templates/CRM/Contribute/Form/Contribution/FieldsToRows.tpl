@@ -49,7 +49,7 @@
                 {if $cnt > $perRowCnt}
                     {continue} {* seriously!? no break!??? Fine, just do nothing then *}
                 {/if}
-                <th class="wiz-th">{$title}</th>
+                <th class="wiz-th"><div class="wiz-th"> {$title} </div></th>
             {/foreach}
         </thead>
         <tbody>

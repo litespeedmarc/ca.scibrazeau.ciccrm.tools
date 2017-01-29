@@ -1,0 +1,39 @@
+.wiz .address {
+    border-color: #5d8a1b;
+}
+
+#step2 > fieldset > div > h3, #step1 > fieldset > h3 {
+    background-color: #d4e1bc;
+}
+
+
+.crm-container th, .crm-container table.display thead th, .crm-container table thead.sticky th, .crm-container table.caseSelector tr.columnheader th  {
+    background-color:#5d8a1b;
+}
+
+#crm-submit-buttons, .crm-container button.crm-form-submit {
+    border-color: #3e7327;
+    background-color:#77b55a;
+}
+
+#_qf_Main_upload-bottom {
+    background-color: #77b55a;
+}
+
+#progress-complete { border: 0;
+    background-color: #5d8a1b;
+}
+
+.crm-container h3, .multi_row_ta {
+    background-color: #d4e1bc;
+}
+
+.crm-container fieldset {
+    border-top : 2px solid #5d8a1b !important;
+}
+
+
+fieldset.wiz {
+    border-color: #5d8a1b;
+    background-color: #f2ffdb;
+}

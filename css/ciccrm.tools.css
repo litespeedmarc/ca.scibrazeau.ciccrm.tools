@@ -1,6 +1,10 @@
 .wiz .address {
-    border: solid 1px #d86d0e;
+    border: 1px solid;
     border-radius: 10px;
+}
+
+.wiz-th {
+    color : white;
 }
 
 table.wiz {
@@ -11,7 +15,6 @@ fieldset.wiz > thead {
 }
 
 #step2 > fieldset > div > h3, #step1 > fieldset > h3 {
-    background-color: #ffd387;
 }
 
 
@@ -20,31 +23,82 @@ fieldset.wiz > thead {
 }
 
 .crm-container th, .crm-container table.display thead th, .crm-container table thead.sticky th, .crm-container table.caseSelector tr.columnheader th  {
-    background-color:#d86d0e;
     color:white;
 }
 
 #priceset > fieldset {
-    border:none;
-    border-top:none;
-    margin:0px;
-    padding:0px;
+    border-style: none;
+    margin:0;
+    padding:0;
 }
 
-#progress { position: relative; height: 10px; background-color: #eee; margin-top: 20px; width:80%; margin: 0 auto; margin-top:20px}
-#progress-complete { border: 0; position: absolute; height: 10px; min-width: 10px; background-color: #d86d0e; transition: width .2s ease-in-out; }
+#progress {
+    position: relative;
+    height: 10px;
+    background-color: #eee;
+    width:80%;
+    margin: 20px auto 0;
+}
+
+#progress-complete {
+    border: 0;
+    position: absolute;
+    height: 10px;
+    min-width: 10px;
+    transition: width .2s ease-in-out;
+}
+
+.crm-container #crm-submit-buttons span.crm-button {
+    margin-top: 32px;
+    text-shadow: none;
+    display: block;
+    float: right !important;
+    overflow: visible;
+    padding: 0px;
+}
+
+.crm-button.crm-button-type-upload.crm-button_qf_Main_upload.crm-i-button {
+    background : none;
+    text-shadown : none;
+}
+
+#crm-submit-buttons, .crm-container button.crm-form-submit {
+    color : white;
+    border : 1px solid;
+    border-radius: 4px;
+    margin-top:30px;
+    font-size: 15px;
+    font-weight:bold;
+    padding: 5px 10px;
+    background-image: none;
+    text-shadow: none;
+}
+
+button.crm-form-submit:focus {
+    outline:0;
+}
+
+input.crm-form-submit.default.validate#crm-submit-buttons {
+    float:right;
+    width:40%;
+}
+
+#_qf_Main_upload-bottom {
+    border : none;
+    font-size:15px;
+    font-weight:bold;
+    text-shadow: none;
+}
 
 
 fieldset.wiz.crm-container {
-    border:none;
-    border-top:none;
+    border-style: none;
 }
 
 fieldset.wiz {
+    border: solid ;
     padding: 5px 20px 15px 20px;
     border-radius: 10px;
-    border: solid #d86d0e;
-    background-color: #fbf3c2;
 }
 
 .stepDetails.commands {
@@ -53,4 +107,13 @@ fieldset.wiz {
 
 .crm-form-submit.next {
     float:right;
+}
+
+.crm-form-text.crm-form-number {
+    font-size:15px;
+    padding:5px !important;
+}
+
+.crm-container fieldset.wiz label {
+    font-size : 15px;
 }

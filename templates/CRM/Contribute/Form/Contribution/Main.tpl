@@ -15,9 +15,11 @@
 <script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/jquery.validate.js"></script>
 <script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/additional-methods.js"></script>
 
+
 {assign var=eduRows value=5}
 
 {crmScript ext=ca.scibrazeau.ciccrm.tools file=js/jquery.formtowizard.js}
+{crmStyle ext=ca.scibrazeau.ciccrm.tools file=css/ciccrm.tools.$contributionPageID.css weight=2000000 region=html-header}
 {crmStyle ext=ca.scibrazeau.ciccrm.tools file=css/ciccrm.tools.css weight=1000000 region=html-header}
 
 {if $action & 1024}
@@ -49,9 +51,9 @@
 
 
 
-    <fieldset class="wiz">
+    <fieldset class="wiz no-top-border">
 
-        <legend>Member Personal Data</legend>
+        <legend>Member Personal Data2</legend>
 
         <table class="wiz">
             <tbody>
@@ -204,9 +206,7 @@
             {/if}
 
 
-            <div id="crm-submit-buttons" class="crm-submit-buttons">
-                {include file="CRM/common/formButtons.tpl" location="bottom"}
-            </div>
+            <input id=crm-submit-buttons class="crm-form-submit default validate" name="_qf_Main_upload" value="✓  {ts}Confirm Contribution{/ts}" type="submit" id="_qf_Main_upload-bottom">
     </fieldset>
 
 

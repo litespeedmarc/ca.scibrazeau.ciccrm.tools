@@ -21,8 +21,8 @@
                 validateBeforeNext: null,
                 select:             null,
                 progress:           null,
-                nextBtnName:        'Next &gt;',
-                prevBtnName:        '&lt; Back',
+                nextBtnName:        'Next &nbsp;❯',
+                prevBtnName:        '❮ &nbsp;Back',
                 buttonTag:          'a',
                 nextBtnClass:       'btn next',
                 prevBtnClass:       'btn prev'
@@ -55,7 +55,7 @@
 
             steps.each(function(i) {
                 $(this).wrap('<div id="step' + i + '" class="stepDetails"></div>');
-                $(this).prepend('<p id="step' + i + 'commands" class="commands"></p>');
+                $(this).append('<p id="step' + i + 'commands" class="commands"></p>');
 
                 if( options.showProgress && typeof(options.progress) !== "function") {
                     if( options.showStepNo )
