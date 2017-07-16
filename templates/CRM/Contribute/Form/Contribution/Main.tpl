@@ -11,14 +11,19 @@
 *}
 {* Callback snippet: On-behalf profile *}
 
-<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/jquery.js"></script>
-<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/jquery.validate.js"></script>
-<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/additional-methods.js"></script>
+{*<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/jquery.validate.js"></script>*}
+{*<script type="application/javascript" src="/sites/civiprod.cheminst.ca/modules/extensions/ca.scibrazeau.ciccrm.tools/js/additional-methods.js"></script>*}
 
 
 {assign var=eduRows value=5}
 
-{crmScript ext=ca.scibrazeau.ciccrm.tools file=js/jquery.formtowizard.js}
+{debug}
+
+<script type="application/javascript" src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/jquery.js"></script>
+<script type="application/javascript" src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/jquery.validate.js"></script>
+<script type="application/javascript" src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/additional-methods.js"></script>
+<script type="application/javascript" src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/jquery.formtowizard.js"></script>
+
 {crmStyle ext=ca.scibrazeau.ciccrm.tools file=css/ciccrm.tools.$contributionPageID.css weight=2000000 region=html-header}
 {crmStyle ext=ca.scibrazeau.ciccrm.tools file=css/ciccrm.tools.css weight=1000000 region=html-header}
 
@@ -70,7 +75,7 @@
                     </div>
                 </td>
                 <td>
-                {include fieldyyName='preferred_language'      file="CRM/Contribute/Form/Contribution/BlockField.tpl" profileFields=$customPre required=true}
+                {include fieldName='preferred_language'      file="CRM/Contribute/Form/Contribution/BlockField.tpl" profileFields=$customPre required=true}
                 </td>
             </tr>
 
@@ -223,6 +228,9 @@
 
     $( function() {
 
+        // I have no idea why CiviCrm adds this second field.  When upgrading from 4.7.12 to 4.7.20, an extra birth date
+        // field just appeared.  This removes it!
+        $("input[id^=birth_date_display_]").hide()
 
         var $signupForm = $( '#Main' );
 
