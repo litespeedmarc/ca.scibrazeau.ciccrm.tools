@@ -12,9 +12,9 @@ class CRM_Tools_Page_CCImport extends CRM_Core_Page {
 
     $rows = CRM_Core_DAO::executeQuery("
 select distinct con.id, cc_type_id, trim(cc_card_no) as cc_card_no, cc_card_expiry, cc_card_ccv_no, cc_name_on_card, ac.last_name, ac.first_name
-    from amsoft.p_memf_preauthorization as amsoft_pap
+    from amsoft2.p_memf_preauthorization as amsoft_pap
     		inner join civicrm_contact con on con.external_identifier = amsoft_pap.constit_id
-    		inner join amsoft.p_constit ac on ac.constit_id = amsoft_pap.constit_id
+    		inner join amsoft2.p_constit ac on ac.constit_id = amsoft_pap.constit_id
     		where not exists(select * from civicrm_cardvault cv where cv.contact_id = con.id)
                   and cc_card_no is not null
                   and length(trim(cc_card_no)) > 0

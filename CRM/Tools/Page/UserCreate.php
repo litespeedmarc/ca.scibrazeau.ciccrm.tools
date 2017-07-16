@@ -22,16 +22,45 @@ public function run() {
 
   private function createUsersForContactsInGroup($smartGroupId) {
 
+    $rows = CRM_Core_DAO::executeQuery("
+select contact_id, email
+from civicrm_contact
+  inner join civicrm_email on contact_id = civicrm_contact.id
+                              and civicrm_email.is_primary = 1
+				and not email like 'lyndsayburman%'
+                              and not exists(SELECT *
+                                         FROM users u
+                                         WHERE lower(u.name) = lower(civicrm_email.email) COLLATE utf8_general_ci)
+                              and not exists(SELECT *
+                                             FROM users u
+                                             WHERE lower(u.mail) = lower(civicrm_email.email) COLLATE utf8_general_ci)
+                              and not email like '%@%@%'
+                              and not email like '%-%'
+                              and email regexp '^[A-Za-z@0-9._]{1,}$'
+ 
+                              and exists(select * from civicrm_membership mem where mem.end_date >= '2016-12-10'
+                                                                                    and mem.contact_id = civicrm_contact.id
+                                                                                    and mem.membership_type_id in (select id from civicrm_membership_type t where t.member_of_contact_id in (5,6,7))
+                              )
+                              and civicrm_contact.contact_type = 'Individual'
+
+
+        ");
+
+
+
     $contacts = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
       'group' => $smartGroupId,
     ))['values'];
 
     $cnt = 0;
-    foreach ($contacts as $idx=>$contact) {
 
-      $contact_id = $contact['id'];
-      $email = $contact['email'];
+ while ( $rows->fetch()) {
+
+
+      $contact_id = $rows->contact_id;
+      $email = $rows->email;
 
 Civi::log()->info(ts('Creating drupal user account for %1, e-mail == %2', [
       1 => $contact_id,
@@ -44,9 +73,8 @@ Civi::log()->info(ts('Skipping, no email'));
         continue;
       }
       if (!preg_match("/^[A-Za-z@0-9._-]{1,}$/", $email)) {
-Civi::log()->info(ts('Skipping, bad email'));
+Civi::log()->info(ts('Skipping, bad email: '  . $email));
         CRM_Core_Session::setStatus("Contact $contact_id's email ($email) is invalid. No account created", "Warning");
-        continue;
       }
 
       $params =  [ 1 => [$email, 'String']];
@@ -67,7 +95,12 @@ Civi::log()->info(ts('Skipping, exists '));
       ];
 
 Civi::log()->info(ts('Creating'));
+try {
       CRM_Core_BAO_CMSUser::create($params, 'email');
+} catch (Exception $e) {
+	Civi::log()->info("Skipped $email because of an error: " . $e->getMessage());
+	continue;
+}
 
 Civi::log()->info(ts('Created'));
 
