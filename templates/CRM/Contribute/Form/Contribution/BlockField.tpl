@@ -75,12 +75,6 @@
                         {include file="CRM/Profile/Form/GreetingType.tpl"}
                     {elseif ($n eq 'group' && $form.group) || ($n eq 'tag' && $form.tag)}
                         {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$n title=null context="profile"}
-                    {elseif ( $n|substr:-5:5 eq '_date' ) AND
-                    ( $form.formName neq 'Confirm' )  AND
-                    ( $form.formName neq 'ThankYou' ) }
-                        {include file="CRM/common/jcalendar.tpl" elementName=$n}
-                    {elseif ( $n|substr:-5:5 eq '_date' )}
-                        {$form.$n.value|date_format:"%Y-%m-%d"|crmDate:$config->dateformatshortdate}
                     {elseif $n|substr:0:5 eq 'phone'}
                         {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}
                         {if $prefix}{$form.$prefix.$n.html}{else}{$form.$n.html}{/if}

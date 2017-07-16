@@ -228,10 +228,6 @@
 
     $( function() {
 
-        // I have no idea why CiviCrm adds this second field.  When upgrading from 4.7.12 to 4.7.20, an extra birth date
-        // field just appeared.  This removes it!
-        $("input[id^=birth_date_display_]").hide()
-
         var $signupForm = $( '#Main' );
 
         $.validator.addMethod("select_idx_gt_0", function(value, element) {
