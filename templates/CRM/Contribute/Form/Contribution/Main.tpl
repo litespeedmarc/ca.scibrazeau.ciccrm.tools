@@ -17,8 +17,6 @@
 
 {assign var=eduRows value=5}
 
-{debug}
-
 <script type="application/javascript" src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/jquery.js"></script>
 <script type="application/javascript" src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/jquery.validate.js"></script>
 <script type="application/javascript" src="{$config->extensionsURL}ca.scibrazeau.ciccrm.tools/js/additional-methods.js"></script>
