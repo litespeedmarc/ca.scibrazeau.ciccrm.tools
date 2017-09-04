@@ -204,17 +204,37 @@ select max(join_date)
 
 
   if (!empty($params['tplParams']['contributionID'])) {
-    // add cic prefixed items to faciliate finding things
-    $contrib = $result = civicrm_api3('Contribution', 'get', array(
-      'sequential' => 1,
-      'id' => $params['tplParams']['contributionID'],
-    ))['values'][0];
+    $contrib = CRM_core_DAO::executeQuery("
+select cont.id,
+       trxn.card_type_id as card_type_id,
+       trxn.payment_instrument_id as payment_instrument_id,
+       payt.label as payment_instrument,
+       cctp.label as card_type,
+       cont.invoice_id,
+       cont.receive_date,
+       cont.trxn_id,
+       cont.check_number
+  from civicrm_contribution cont
+    left join civicrm_entity_financial_trxn ceft on ceft.entity_table = 'civicrm_contribution' and ceft.entity_id = cont.id
+    left join civicrm_financial_trxn trxn on trxn.id = ceft.financial_trxn_id
+    left join civicrm_option_value cctp on cctp.value = trxn.card_type_id and cctp.option_group_id = 9
+    left join civicrm_option_value payt on payt.value = trxn.payment_instrument_id and payt.option_group_id = 10
+ where cont.id = %1
+ ", array(
+      1 => array($params['tplParams']['contributionID'], 'Integer'),
+    ));
 
-    $params['tplParams']['payment_instrument'] = $contrib['payment_instrument'];
-    $params['tplParams']['invoice_id'] = $contrib['invoice_id'];
-    $params['tplParams']['receive_date'] = $contrib['receive_date'];
-    $params['tplParams']['trxn_id'] = $contrib['trxn_id'];
-    $params['tplParams']['check_number'] = $contrib['check_number'];
+    $contrib->fetch();
+
+    if (!empty($contrib->card_type)) {
+      $params['tplParams']['payment_instrument'] = $contrib->card_type;
+    } else {
+      $params['tplParams']['payment_instrument'] = $contrib->payment_instrument;
+    }
+    $params['tplParams']['invoice_id'] = $contrib->invoice_id;
+    $params['tplParams']['receive_date'] = $contrib->receive_date;
+    $params['tplParams']['trxn_id'] = $contrib->trxn_id;
+    $params['tplParams']['check_number'] = $contrib->check_number;
 
   }
 
